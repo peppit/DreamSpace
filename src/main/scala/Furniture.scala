@@ -1,4 +1,6 @@
-trait Furniture(shape: Shape, color:Color):
+import scalafx.scene.paint.Color
+
+trait Furniture(name: String, shape: Shape, color: Color) extends App:
 
   def fits(s: Shape) = ???
 

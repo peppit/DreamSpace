@@ -6,6 +6,6 @@ class App(furnitures: Array[Furniture]):
 
   def downLoadPic: Unit = ???
 
-  def rotateFurniture(f: furniture): Unit = ???
+  def rotateFurniture(f: Furniture): Unit = ???
 
   def save() = ???
