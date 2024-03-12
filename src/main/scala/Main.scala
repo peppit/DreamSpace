@@ -2,10 +2,9 @@ import scalafx.application.JFXApp3
 import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, StackPane, VBox}
-import scalafx.scene.canvas.Canvas
-import scalafx.scene.control.{Button, ColorPicker, Label, Menu, MenuBar, MenuItem, RadioButton, ToggleGroup}
+import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control.{Alert, Button, ButtonType, Label, Menu, MenuBar, MenuItem}
 import scalafx.scene.paint.Color
-import scalafx.scene.paint.Color.*
 import scalafx.scene.paint.Color.*
 import scalafx.scene.text.Font
 
@@ -26,10 +25,28 @@ object Main extends JFXApp3:
     val top = new MenuBar:
       menus = Array(menu)
 
-    val button1 = new Button("Table"):   //Here is the button what I would like to get to work
-      onAction = (event) => ???
+    val circleB = new ButtonType("Circle")
+    val rectangleB = new ButtonType("Rectangle")
+    val ellipseB = new ButtonType("Ellipse")
+    val halfRB = new ButtonType("Half Round")
 
-    //Tässä luon vain sitä alku näkymää
+    val button1 = new Button("Table")
+      button1.onAction = (event) =>
+
+        val selectShape = new Alert(AlertType.Confirmation):
+          initOwner(stage)
+          headerText = "First select shape!"
+          contentText = "Choose your option."
+          buttonTypes = Seq(circleB, rectangleB, ellipseB, halfRB, ButtonType.Cancel)
+
+        val result = selectShape.showAndWait()
+
+        result match
+          case Some(circleB) => println("you chose circle")
+          case _ => println("either cancel or closed the whole thing")
+
+
+    //This is the original GUI
     val sideLBox= new VBox:
       background = Background.fill(LightPink)
       spacing = 4
@@ -55,32 +72,12 @@ object Main extends JFXApp3:
     root.columnConstraints = Array(column0,column1)
     root.rowConstraints = Array(row0)
 
-    //HOW DO I GET THIS BUTTON "TABLE" WORK IN A WAY THAT ShapeNColor VBox COMES IN MY SCREEN AS A SMALL WINDOW???!!!
-    //I WOULD LIKE TO MAKE A WINDOW WHERE I COULD PICK A COLOR AND SHAPE
-
-    val rootB = Button("Table")
-
-    val scene2 = Scene( parent = rootB )
-    stage.scene = scene2
-
-    val shapeSelector = ToggleGroup()
-
-    val circleSelector = new RadioButton("Circle"):
-      toggleGroup = shapeSelector
-      selected = true
-
-    val rectangleSelector = new RadioButton("Rectangle"):
-      toggleGroup = shapeSelector
-
-    val shapeNColor = new VBox:
-      prefHeight = 400
-      prefWidth = 400
-      spacing = 10
-      children = Array(ColorPicker(Color.Pink), circleSelector, rectangleSelector)
+    //Here comes the alert that I would like to show when the button "Table" is clicked.
 
 
 
-    val scene = Scene(parent = root)
+
+    val scene = new Scene(parent = root)
     stage.scene = scene
 
 
