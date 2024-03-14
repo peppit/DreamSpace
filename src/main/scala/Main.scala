@@ -7,11 +7,14 @@ import scalafx.scene.control.{Alert, Button, ButtonType, Label, Menu, MenuBar, M
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.*
 import scalafx.scene.text.Font
+import scalafx.stage.FileChooser
+import scalafx.stage.FileChooser.ExtensionFilter
 
 object Main extends JFXApp3:
 
   def start() =
 
+    //the stage for the interface
     stage = new JFXApp3.PrimaryStage:
       title = "Dream Space"
       width = 900
@@ -19,21 +22,36 @@ object Main extends JFXApp3:
 
     val root = GridPane()
 
+    //Here is the button for filechooser don't know how to combine the filechooserbutton to this
     val menu = new Menu("File"):
       items = Array(MenuItem("New"), MenuItem("Save"))
 
     val top = new MenuBar:
       menus = Array(menu)
 
+    //NÄÄ 2 KOMMATAAN NII OHJELMA TOIMII
+    /*
+    val filechooser = new FileChooser:
+      title = "Select the picture of the floorplan"
+      //Opens the files
+      initialDirectory = File("./src/main/DreamSpace.testikansio")  //MIKS EI LÖYDÄ?
+      extensionFilters.add(ExtensionFilter("PNG", "*.png", "JPG", ".jpg")) //WHAAAT???
+
+    val file = filechooser.showOpenDialog(stage)
+    */
+
+    // Buttons for shapes
     val circleB = new ButtonType("Circle")
     val rectangleB = new ButtonType("Rectangle")
     val ellipseB = new ButtonType("Ellipse")
     val halfRB = new ButtonType("Half Round")
 
-    val button1 = new Button("Table")
-      button1.onAction = (event) =>
 
-        val selectShape = new Alert(AlertType.Confirmation):
+    // Buttons for furnitures:
+    val tableButton = new Button("Table")
+      tableButton.onAction = (event) =>
+
+        var selectShape = new Alert(AlertType.Confirmation):
           initOwner(stage)
           headerText = "First select shape!"
           contentText = "Choose your option."
@@ -43,14 +61,25 @@ object Main extends JFXApp3:
 
         result match
           case Some(circleB) => println("you chose circle")
-          case _ => println("either cancel or closed the whole thing")
+          case _ => println("either cancel or closed the whole thing")   //BUGI!!!!!!
+
+
+    val bedButton = new Button("Bed")
+    val carpetButton = new Button("Carpet")
+    val chairButton = new Button("Chair")
+    val closetButton = new Button("Closet")
+    val lampButton = new Button("Lamp")
+    val tvButton = new Button("TV")
+    val sofaButton = new Button("Sofa")
+
+
 
 
     //This is the original GUI
     val sideLBox= new VBox:
       background = Background.fill(LightPink)
-      spacing = 4
-      children = Array( top, button1, Button("Bed"), Button("Chair"))
+      spacing = 5
+      children = Array( top, tableButton, bedButton,carpetButton, chairButton, closetButton, lampButton, tvButton, sofaButton)
 
     val label = new Label("Design your dream home!")
     label.font = Font(18)
@@ -63,18 +92,14 @@ object Main extends JFXApp3:
     root.add(sideRBox, 1, 0)
 
     val column0 = new ColumnConstraints:
-      percentWidth = 10
+      percentWidth = 6
     val column1 = new ColumnConstraints:
-      percentWidth = 90
+      percentWidth = 94
     val row0 = new RowConstraints:
       percentHeight = 100
 
     root.columnConstraints = Array(column0,column1)
     root.rowConstraints = Array(row0)
-
-    //Here comes the alert that I would like to show when the button "Table" is clicked.
-
-
 
 
     val scene = new Scene(parent = root)
