@@ -4,11 +4,13 @@ import scalafx.scene.Scene
 import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, StackPane, VBox}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, Button, ButtonType, Label, Menu, MenuBar, MenuItem}
+import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.*
 import scalafx.scene.text.Font
 import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
+
 import java.io.File
 
 object Main extends JFXApp3:
@@ -18,21 +20,35 @@ object Main extends JFXApp3:
     //the stage for the interface
     stage = new JFXApp3.PrimaryStage:
       title = "Dream Space"
-      width = 900
-      height = 600
+      width = 1000
+      height = 700
 
     val root = GridPane()
 
+// Possible imageview
+    val imageView = new ImageView:
+      fitHeight = 580
+      fitWidth = 580
+      preserveRatio = true
+
+
+// method for selecting the wanted file
+    def selectFile() =
+          val filechooser = new FileChooser:
+            title = "Select the picture of the floorplan"
+            initialDirectory = File("./src/main/DreamSpace.testikansio")
+            extensionFilters.add(ExtensionFilter("PNG and JPG", Seq("*.png", "*.jpg")))
+
+          val selectedFile = filechooser.showOpenDialog(stage)
+
+          if selectedFile != null then
+            imageView.image = new Image(selectedFile.toURI.toString)
+          else
+            println("Et valinnu mitäää")
+
+
     val fileNew = MenuItem("New")
-      fileNew.onAction = (event) =>
-
-        val filechooser = new FileChooser:
-         title = "Select the picture of the floorplan"
-      //Opens the files
-         initialDirectory = File("./src/main/DreamSpace.testikansio")  //MIKS EI LÖYDÄ?
-         extensionFilters.add(ExtensionFilter("PNG and JPG", Seq("*.png", "*.jpg"))) //WHAAAT???
-
-        val file = filechooser.showOpenDialog(stage)
+      fileNew.onAction = (event) => selectFile()
 
 
     //Here is the button for filechooser don't know how to combine the filechooserbutton to this
@@ -41,15 +57,6 @@ object Main extends JFXApp3:
 
     val top = new MenuBar:
       menus = Array(menu)
-
-    //NÄÄ 2 KOMMATAAN NII OHJELMA TOIMII
-
-
-    // Buttons for shapes
-    /*val circleB = new ButtonType("Circle")
-    val rectangleB = new ButtonType("Rectangle")
-    val ellipseB = new ButtonType("Ellipse")
-    val halfRB = new ButtonType("Half Round")*/
 
 
     // Buttons for furnitures:
@@ -84,8 +91,6 @@ object Main extends JFXApp3:
     val sofaButton = new Button("Sofa")
 
 
-
-
     //This is the original GUI
     val sideLBox= new VBox:
       background = Background.fill(LightPink)
@@ -95,23 +100,31 @@ object Main extends JFXApp3:
     val label = new Label("Design your dream home!")
     label.font = Font(18)
 
-    val sideRBox = new VBox:
+    val topBox = new VBox:
       background = Background.fill(White)
       children = Array(label)
 
+    var floorPlanBox = new VBox:
+      background = Background.fill(White)
+      children = Array(imageView)
+
+
     root.add(sideLBox, 0, 0, 1, 2)
-    root.add(sideRBox, 1, 0)
+    root.add(topBox, 1, 0, 1, 1)
+    root.add(floorPlanBox, 1, 1, 1, 1)
+
 
     val column0 = new ColumnConstraints:
       percentWidth = 6
     val column1 = new ColumnConstraints:
       percentWidth = 94
     val row0 = new RowConstraints:
-      percentHeight = 100
+      percentHeight = 6
+    val row1 = new RowConstraints:
+      percentHeight = 94
 
     root.columnConstraints = Array(column0,column1)
-    root.rowConstraints = Array(row0)
-
+    root.rowConstraints = Array(row0, row1)
 
     val scene = new Scene(parent = root)
     stage.scene = scene
