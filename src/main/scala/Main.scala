@@ -44,7 +44,7 @@ object Main extends JFXApp3:
           if selectedFile != null then
             imageView.image = new Image(selectedFile.toURI.toString)
           else
-            println("Et valinnu mitäää")
+            println("No file selected")
 
 
     val fileNew = MenuItem("New")
@@ -58,32 +58,32 @@ object Main extends JFXApp3:
     val top = new MenuBar:
       menus = Array(menu)
 
+    //Alert for selecting shapes
+    def shapeSelect() =
+
+      val circleB = new ButtonType("Circle")
+      val rectangleB = new ButtonType("Rectangle")
+      val ellipseB = new ButtonType("Ellipse")
+      val halfRB = new ButtonType("Half Round")
+
+      val select = new Alert(AlertType.Confirmation):
+        initOwner(stage)
+        headerText = "First select shape!"
+        contentText = "Choose your option."
+        buttonTypes = Seq(circleB, rectangleB, ellipseB, halfRB, ButtonType.Cancel)
+
+      val result = select.showAndWait()
+
+      result match
+        case Some(circleB) => println("you chose circle")
+        case _ => println("either cancel or closed the whole thing")
 
     // Buttons for furnitures:
     val tableButton = new Button("Table")
-      tableButton.onAction = (event) =>
-
-        val circleB = new ButtonType("Circle")
-        val rectangleB = new ButtonType("Rectangle")
-        val ellipseB = new ButtonType("Ellipse")
-        val halfRB = new ButtonType("Half Round")
-
-        val selectShape = new Alert(AlertType.Confirmation):
-          initOwner(stage)
-          headerText = "First select shape!"
-          contentText = "Choose your option."
-          buttonTypes = Seq(circleB, rectangleB, ellipseB, halfRB, ButtonType.Cancel)
-
-        val result = selectShape.showAndWait()
-
-        result match
-          case Some(rectangleB) => println("lslslslsl")
-          case Some(circleB) => println("you chose circle")
-          case _ => println("either cancel or closed the whole thing")   //BUGI!!!!!!
-
-
+      tableButton.onAction = (event) => shapeSelect()
     val bedButton = new Button("Bed")
     val carpetButton = new Button("Carpet")
+      carpetButton.onAction = (event) => shapeSelect()
     val chairButton = new Button("Chair")
     val closetButton = new Button("Closet")
     val lampButton = new Button("Lamp")
