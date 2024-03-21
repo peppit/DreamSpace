@@ -1,15 +1,19 @@
-import scalafx.application.JFXApp3
+import scalafx.application.{JFXApp3, Platform}
 import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, StackPane, VBox}
 import scalafx.scene.control.Alert.AlertType
-import scalafx.scene.control.{Alert, Button, ButtonType, Label, Menu, MenuBar, MenuItem}
+import scalafx.scene.control.ButtonBar.ButtonData
+import scalafx.scene.control.{Alert, Button, ButtonType, Dialog, Label, Menu, MenuBar, MenuItem, TextField}
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.*
 import scalafx.scene.text.Font
 import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
+import scalafx.Includes.jfxDialogPane2sfx
+import scalafx.Includes.jfxNode2sfx
+import scalafx.scene.input.KeyCode.A
 
 import java.io.File
 
@@ -68,20 +72,110 @@ object Main extends JFXApp3:
 
       val select = new Alert(AlertType.Confirmation):
         initOwner(stage)
+        title = "Selecting shape"
         headerText = "First select shape!"
         contentText = "Choose your option."
         buttonTypes = Seq(circleB, rectangleB, ellipseB, halfRB, ButtonType.Cancel)
 
       val result = select.showAndWait()
 
+      result match {
+        case Some(button) => if button == circleB then
+          println("you chose circle")
+        else if button == rectangleB then
+          sizeSelectRectangle()
+        else if button == ellipseB then
+          println("you chose ellipse")
+        else if button == halfRB then
+          println("you chose half round")
+        else
+          println("you chose cancel")
+        case _ => println("No button selected")
+        }
+
+     // Alert for selecting size and color!!!! YAY
+    def sizeSelectRectangle() =
+
+      val dialog = new Dialog[RectangleObjects]():
+        initOwner(stage)
+        title = "Measurements"
+        headerText = "Please enter the measurements and wanted colour."
+
+      val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
+      dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
+
+      val sideL1 = new TextField():
+        promptText = "lenght in cm"
+
+      val sideL2 = new TextField():
+        promptText = "lenght in cm"
+
+      val colorPick = new TextField():
+        promptText = "Write the first letter with caps"
+
+      val grid = new GridPane():
+         hgap = 10
+         vgap = 10
+         padding = Insets(20, 100, 10, 10)
+
+         add(new Label("Side 1 lenght:"), 0, 0)
+         add(sideL1, 1,0)
+         add(new Label("Side 2 lenght:"), 0, 1)
+         add(sideL2,1,1)
+         add(new Label("Color:"), 0, 2)
+         add(colorPick, 1, 2)
+
+      val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
+      confirmButton.disable = true
+
+      sideL1.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+      sideL2.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+
+      dialog.dialogPane().content = grid
+
+      Platform.runLater(sideL1.requestFocus())
+
+      dialog.resultConverter = dialogButton =>
+        if (dialogButton == confirmButtonType) then
+          RectangleObjects(sideL1.text().toDouble, sideL2.text().toDouble)
+        else
+          null
+
+      val result = dialog.showAndWait()
+
       result match
-        case Some(circleB) => println("you chose circle")
-        case _ => println("either cancel or closed the whole thing")
+        case Some(RectangleObjects(u,p)) => println("Sait toimiin")
+        case None => println("Dialog returned: None")
+        case _ => println("something else happened")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Buttons for furnitures:
     val tableButton = new Button("Table")
       tableButton.onAction = (event) => shapeSelect()
     val bedButton = new Button("Bed")
+      bedButton.onAction = (event) => sizeSelectRectangle()
     val carpetButton = new Button("Carpet")
       carpetButton.onAction = (event) => shapeSelect()
     val chairButton = new Button("Chair")
