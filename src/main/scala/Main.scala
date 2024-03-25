@@ -1,6 +1,6 @@
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.geometry.{Insets, Orientation, Pos}
-import scalafx.scene.Scene
+import scalafx.scene.{Scene, image}
 import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, StackPane, VBox}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.ButtonBar.ButtonData
@@ -14,10 +14,14 @@ import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.Includes.jfxDialogPane2sfx
 import scalafx.Includes.jfxNode2sfx
 import scalafx.scene.input.KeyCode.A
+import scalafx.scene.shape.Rectangle
+import scalafx.Includes.string2sfxColor
 
 import java.io.File
 
 object Main extends JFXApp3:
+
+  var possibleObject: Option[Shape] = None  // not sure if I'm gonna use this one. You can ignore this.
 
   def start() =
 
@@ -27,10 +31,10 @@ object Main extends JFXApp3:
       width = 1000
       height = 700
 
-    val root = GridPane()
+    val root = GridPane()   //Do I keep the GridPane or switch to the StackPane?
 
 // Possible imageview
-    val imageView = new ImageView:
+    var imageView = new ImageView:
       fitHeight = 580
       fitWidth = 580
       preserveRatio = true
@@ -55,7 +59,7 @@ object Main extends JFXApp3:
       fileNew.onAction = (event) => selectFile()
 
 
-    //Here is the button for filechooser don't know how to combine the filechooserbutton to this
+    //Here is the button for filechooser
     val menu = new Menu("File"):
       items = Array(fileNew, MenuItem("Save"))
 
@@ -93,10 +97,11 @@ object Main extends JFXApp3:
         case _ => println("No button selected")
         }
 
-     // Alert for selecting size and color!!!! YAY
+
+     // Alert for selecting size and color!!!! The problem is in this method
     def sizeSelectRectangle() =
 
-      val dialog = new Dialog[RectangleObjects]():
+      val dialog = new Dialog[RectangleObject]():
         initOwner(stage)
         title = "Measurements"
         headerText = "Please enter the measurements and wanted colour."
@@ -141,34 +146,32 @@ object Main extends JFXApp3:
 
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
-          RectangleObjects(sideL1.text().toDouble, sideL2.text().toDouble)
+          RectangleObject(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.text())
         else
           null
 
       val result = dialog.showAndWait()
 
       result match
-        case Some(RectangleObjects(u,p)) => println("Sait toimiin")
+        case Some(RectangleObject(u,p, c)) =>
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          possibleObject = Some(RectangleObject(u,p, c))
+          // HOW DO I GET THIS RECTANGLEOBJECT ON THE SCEEN? I WOULD LIKE TO HAVE IT ON TOP OF THE PICTURE OF FLOORPLAN.
+
+          val r = new Rectangle()
+          r.setX(300)
+          r.setY(200)
+          r.setWidth(u)
+          r.setHeight(p)
+          r.fill = c
+
+          println("Sait toimiin")
+
+     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // Buttons for furnitures:

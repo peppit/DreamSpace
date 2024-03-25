@@ -1,0 +1,9 @@
+Kuinka yhdistän furnituren näytölle???
+
+Ehdotuksia: StackPanella saa ehkä samoin canvasilla voisi onnistua??
+
+Se vaan et, jos stackpanella lähtee tekeen ongelmana on että en tiiä miten piirtää ja asettaa enää niitä grafiikoita oikein siihe GUI:hin. 
+
+Laitoin koodiin kohdat missä jumittaaaa. 
+
+
