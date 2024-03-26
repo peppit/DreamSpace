@@ -16,6 +16,7 @@ import scalafx.Includes.jfxNode2sfx
 import scalafx.scene.input.KeyCode.A
 import scalafx.scene.shape.Rectangle
 import scalafx.Includes.string2sfxColor
+import scalafx.scene.canvas.Canvas
 
 import java.io.File
 
@@ -33,11 +34,17 @@ object Main extends JFXApp3:
 
     val root = GridPane()   //Do I keep the GridPane or switch to the StackPane?
 
+
 // Possible imageview
     var imageView = new ImageView:
       fitHeight = 580
       fitWidth = 580
       preserveRatio = true
+
+    var floorPlanBox = new StackPane()
+     // background = Background.fill(White)
+    //  children = Array(imageView)
+
 
 
 // method for selecting the wanted file
@@ -51,6 +58,7 @@ object Main extends JFXApp3:
 
           if selectedFile != null then
             imageView.image = new Image(selectedFile.toURI.toString)
+            floorPlanBox.children.add(imageView)
           else
             println("No file selected")
 
@@ -160,11 +168,13 @@ object Main extends JFXApp3:
           // HOW DO I GET THIS RECTANGLEOBJECT ON THE SCEEN? I WOULD LIKE TO HAVE IT ON TOP OF THE PICTURE OF FLOORPLAN.
 
           val r = new Rectangle()
-          r.setX(300)
-          r.setY(200)
+          r.setX(400)
+          r.setY(50)
           r.setWidth(u)
           r.setHeight(p)
           r.fill = c
+
+          floorPlanBox.children += r
 
           println("Sait toimiin")
 
@@ -172,7 +182,6 @@ object Main extends JFXApp3:
      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
-
 
     // Buttons for furnitures:
     val tableButton = new Button("Table")
@@ -200,11 +209,6 @@ object Main extends JFXApp3:
     val topBox = new VBox:
       background = Background.fill(White)
       children = Array(label)
-
-    var floorPlanBox = new VBox:
-      background = Background.fill(White)
-      children = Array(imageView)
-
 
     root.add(sideLBox, 0, 0, 1, 2)
     root.add(topBox, 1, 0, 1, 1)
