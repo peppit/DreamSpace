@@ -1,13 +1,13 @@
 import scalafx.scene.paint.Color
 
-case class EllipseObject(diameterX: Double, diameterY: Double) extends Shape:
+
+case class EllipseObject(diameterX: Double, diameterY: Double):
 
   def area: Double = scala.math.Pi * (diameterX/2) * (diameterY/2)
 
 
 
-
-case class HalfRoundObject(diameterX: Double, radiusY: Double) extends Shape:
+case class HalfRoundObject(diameterX: Double, radiusY: Double):
 
   def area: Double = (scala.math.Pi * (diameterX/2) * radiusY)/2
 
@@ -19,8 +19,7 @@ case class RectangleObject(sideL1: Double, sideL2: Double, color: Color) extends
   
   
 
-
-case class RoundObject(diameter: Double) extends Shape:
+case class RoundObject(diameter: Double, color: Color) extends Shape:
 
   def area = scala.math.Pi * diameter * diameter
 

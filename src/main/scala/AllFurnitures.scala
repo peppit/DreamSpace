@@ -1,5 +1,4 @@
-/**
-
+/*
 import scalafx.scene.paint.Color
 
 case class Bed(shape: Shape, color: Color) extends Furniture(shape, color), Shape:

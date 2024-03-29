@@ -14,7 +14,7 @@ import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.Includes.jfxDialogPane2sfx
 import scalafx.Includes.jfxNode2sfx
 import scalafx.scene.input.KeyCode.A
-import scalafx.scene.shape.Rectangle
+import scalafx.scene.shape.{Circle, Rectangle}
 import scalafx.Includes.string2sfxColor
 import scalafx.scene.canvas.Canvas
 
@@ -22,7 +22,10 @@ import java.io.File
 
 object Main extends JFXApp3:
 
-  var possibleObject: Option[Shape] = None  // not sure if I'm gonna use this one. You can ignore this.
+  var possibleObject: Option[Shape] = None
+  var possibleFurniture: Option[String] = None
+  
+  var furnitures: Array[Furniture] = Array[Furniture]()
 
   def start() =
 
@@ -32,7 +35,7 @@ object Main extends JFXApp3:
       width = 1000
       height = 700
 
-    val root = GridPane()   //Do I keep the GridPane or switch to the StackPane?
+    val root = GridPane()
 
 
 // Possible imageview
@@ -42,8 +45,7 @@ object Main extends JFXApp3:
       preserveRatio = true
 
     var floorPlanBox = new StackPane()
-     // background = Background.fill(White)
-    //  children = Array(imageView)
+
 
 
 
@@ -65,7 +67,6 @@ object Main extends JFXApp3:
 
     val fileNew = MenuItem("New")
       fileNew.onAction = (event) => selectFile()
-
 
     //Here is the button for filechooser
     val menu = new Menu("File"):
@@ -93,7 +94,7 @@ object Main extends JFXApp3:
 
       result match {
         case Some(button) => if button == circleB then
-          println("you chose circle")
+          sizeSelectCircle()
         else if button == rectangleB then
           sizeSelectRectangle()
         else if button == ellipseB then
@@ -106,7 +107,7 @@ object Main extends JFXApp3:
         }
 
 
-     // Alert for selecting size and color!!!! The problem is in this method
+     // Alert for selecting size and color for rectangle shaped objects
     def sizeSelectRectangle() =
 
       val dialog = new Dialog[RectangleObject]():
@@ -162,11 +163,7 @@ object Main extends JFXApp3:
 
       result match
         case Some(RectangleObject(u,p, c)) =>
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           possibleObject = Some(RectangleObject(u,p, c))
-          // HOW DO I GET THIS RECTANGLEOBJECT ON THE SCEEN? I WOULD LIKE TO HAVE IT ON TOP OF THE PICTURE OF FLOORPLAN.
-
           val r = new Rectangle()
           r.setX(400)
           r.setY(50)
@@ -178,23 +175,94 @@ object Main extends JFXApp3:
 
           println("Sait toimiin")
 
-     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        case None => println("Dialog returned: None")
+        case _ => println("something else happened")
+
+    // Alert for selecting size and color for circle shaped furniture:
+    def sizeSelectCircle() =
+      val dialog = new Dialog[RoundObject]():
+        initOwner(stage)
+        title = "Measurements"
+        headerText = "Please enter the measurements and wanted colour."
+
+      val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
+      dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
+
+      val diameter = new TextField():
+        promptText = "diameter in cm"
+
+      val colorPick = new TextField():
+        promptText = "Write the first letter with caps"
+
+      val grid = new GridPane():
+         hgap = 10
+         vgap = 10
+         padding = Insets(20, 100, 10, 10)
+
+         add(new Label("Diameter in cm:"), 0, 0)
+         add(diameter, 1,0)
+         add(new Label("Color:"), 0, 1)
+         add(colorPick, 1, 1)
+
+      val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
+      confirmButton.disable = true
+
+      diameter.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+      colorPick.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+
+      dialog.dialogPane().content = grid
+
+      Platform.runLater(diameter.requestFocus())
+
+      dialog.resultConverter = dialogButton =>
+        if (dialogButton == confirmButtonType) then
+          RoundObject(diameter.text().toDouble, colorPick.text())
+        else
+          null
+
+      val result = dialog.showAndWait()
+
+      result match
+        case Some(RoundObject(d, c)) =>
+          possibleObject = Some(RoundObject(d, c))
+
+          val cir = new Circle()
+          cir.setCenterX(400)
+          cir.setCenterY(50)
+          cir.setRadius(d/2)
+          cir.fill = c
+
+          //furnitures += Furniture(possibleFurniture.get, cir, c)
+          floorPlanBox.children += cir
+
+          println("Sait toimiin")
+
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
 
     // Buttons for furnitures:
     val tableButton = new Button("Table")
-      tableButton.onAction = (event) => shapeSelect()
+      tableButton.onAction = (event) =>
+        shapeSelect()
     val bedButton = new Button("Bed")
-      bedButton.onAction = (event) => sizeSelectRectangle()
+      bedButton.onAction = (event) => 
+        possibleFurniture = Option("Bed")
+        sizeSelectRectangle()
     val carpetButton = new Button("Carpet")
       carpetButton.onAction = (event) => shapeSelect()
     val chairButton = new Button("Chair")
+      chairButton.onAction = (event) => sizeSelectCircle()
     val closetButton = new Button("Closet")
+      closetButton.onAction = (event) => sizeSelectRectangle()
     val lampButton = new Button("Lamp")
+      lampButton.onAction = (event) => sizeSelectCircle()
     val tvButton = new Button("TV")
     val sofaButton = new Button("Sofa")
+      sofaButton.onAction = (event) => shapeSelect()
 
 
     //This is the original GUI
@@ -213,7 +281,6 @@ object Main extends JFXApp3:
     root.add(sideLBox, 0, 0, 1, 2)
     root.add(topBox, 1, 0, 1, 1)
     root.add(floorPlanBox, 1, 1, 1, 1)
-
 
     val column0 = new ColumnConstraints:
       percentWidth = 6
