@@ -1,14 +1,10 @@
-import scalafx.scene.paint.Color
+trait Furniture:
 
-trait Furniture(name: String, shape: Shape, color: Color) extends App:
-
-  def fits(s: Shape) = ???
+  def fits(s: Shape) = true
 
   def overLapMistake: Boolean = false
 
-  def canPutOnto: Array[Furniture]
-
-  def availableShapes: Array[Furniture]
+  def canPutOnto(furniture: Furniture): Boolean
   
   def info(): String
   

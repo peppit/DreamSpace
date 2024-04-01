@@ -17,6 +17,7 @@ import scalafx.scene.input.KeyCode.A
 import scalafx.scene.shape.{Circle, Rectangle}
 import scalafx.Includes.string2sfxColor
 import scalafx.scene.canvas.Canvas
+import scalafx.scene.input.DragEvent
 
 import java.io.File
 
@@ -24,8 +25,8 @@ object Main extends JFXApp3:
 
   var possibleObject: Option[Shape] = None
   var possibleFurniture: Option[String] = None
-  
   var furnitures: Array[Furniture] = Array[Furniture]()
+
 
   def start() =
 
@@ -43,10 +44,15 @@ object Main extends JFXApp3:
       fitHeight = 580
       fitWidth = 580
       preserveRatio = true
-
-    var floorPlanBox = new StackPane()
-
-
+// This is were the image of an floorplan is imported and where the shapes are drawn on
+    var floorPlanBox = new StackPane():    //Should we put the on mouse move here??
+      var shapes = Array[Shape]()          // I was thinking of doing an array for shapes?
+                                           // But also I should do something with the furniture class
+      
+      
+   //How do you even use "onMouseMove" ????
+   // I'm so stuck I don't know what to do. How do I get my shapes moving from dragging the mouse??
+    
 
 
 // method for selecting the wanted file
@@ -171,7 +177,7 @@ object Main extends JFXApp3:
           r.setHeight(p)
           r.fill = c
 
-          floorPlanBox.children += r
+          floorPlanBox.children += r   //Here we add the shape to the picture
 
           println("Sait toimiin")
 
@@ -249,7 +255,7 @@ object Main extends JFXApp3:
       tableButton.onAction = (event) =>
         shapeSelect()
     val bedButton = new Button("Bed")
-      bedButton.onAction = (event) => 
+      bedButton.onAction = (event) =>
         possibleFurniture = Option("Bed")
         sizeSelectRectangle()
     val carpetButton = new Button("Carpet")

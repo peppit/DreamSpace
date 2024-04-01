@@ -1,70 +1,68 @@
-/*
 import scalafx.scene.paint.Color
 
-case class Bed(shape: Shape, color: Color) extends Furniture(shape, color), Shape:
+case class Bed(shape: Shape, color: Color) extends Furniture:
 
-  private val overlaps = Array(Carpet)
-  private val shapes = Array(RectangleObjects, EllipseObjects)
+  def canPutOnto(furniture: Furniture) =
+    if furniture == Carpet then
+      true
+    else false
 
-  def canPutOnto: Array[Furniture] = overlaps
-  def availableShapes: Array[Shape] = shapes
-
-  def available: Boolean = availableShapes.contains(shape)
-
-
-case class Carpet(shape: Shape, color: Color) extends Furniture(shape, color):
-
-  private val overlaps = Array[Furniture]()
-  private val shapes = Array(RectangleObjects, EllipseObjects, RoundObjects, HalfRoundObjects)
-
-  def canPutOnto: Array[Furniture] = overlaps
-  def availableShapes: Array[Shape] = ???
-
-  def available: Boolean = availableShapes.contains(shape)
+  def info() = "This is Bed"
 
 
-case class Chair(shape: Shape, color: Color) extends Furniture(shape, color):
+case class Carpet(shape: Shape, color: Color) extends Furniture:
+
+  def canPutOnto(furniture: Furniture) = false   //you can't put carpet over any furniture.
+
+  def info() = "This is Carpet"
+
+
+case class Chair(shape: Shape, color: Color) extends Furniture:
 
   private val overlaps = Array(Carpet)
 
-  def canPutOnto: Array[Furniture] = overlaps
+  def canPutOnto(furniture: Furniture) =
+    if furniture == Carpet then
+      true
+    else false
 
-  def availableShapes: Array[Shape] = ???
-
-
-case class Closet(shape: Shape, color: Color) extends Furniture(shape, color):
-
-  private val overlaps = Array(Carpet)
-
-  def canPutOnto: Array[Furniture] = ???
-
-  def availableShapes: Array[Shape] = ???
+  def info() = "This is Chair"
 
 
-case class Lamp(shape: Shape, color: Color) extends Furniture(shape, color):
+case class Closet(shape: Shape, color: Color) extends Furniture:
 
-  private val overlaps = Array(Carpet, Table)
+  def canPutOnto(furniture: Furniture) =
+    if furniture == Carpet then
+      true
+    else false
 
-  def canPutOnto: Array[Furniture] = overlaps
-
-  def availableShapes: Array[Shape] = ???
-
-
-case class Table(shape: Shape, color: Color) extends Furniture(shape, color):
-
-  private val overlaps = Array(Carpet)
-
-  def canPutOnto: Array[Furniture] = overlaps
-
-  def availableShapes: Array[Shape] = ???
+  def info() = "This is Closet"
 
 
-case class Sofa(shape: Shape, color: Color) extends Furniture(shape, color):
+case class Lamp(shape: Shape, color: Color) extends Furniture:
 
-  private val overlaps = Array(Carpet)
+  def canPutOnto(furniture: Furniture) = true
 
-  def canPutOnto: Array[Furniture] = overlaps
+  def info() = "This is Lamp"
 
-  def availableShapes: Array[Shape] = ???
 
-*/
+case class Table(shape: Shape, color: Color) extends Furniture:
+
+  def canPutOnto(furniture: Furniture) =
+    if furniture == Carpet then
+      true
+    else false
+
+  def info() = "This is Table"
+
+
+class Sofa(shape: Shape, color: Color) extends Furniture:
+
+  def canPutOnto(furniture: Furniture) =
+    if furniture == Carpet then
+      true
+    else false
+
+  def info() = "Sofa"
+
+

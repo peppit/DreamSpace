@@ -1,4 +1,4 @@
-class App(furnitures: Array[Furniture]):
+/*class App(furnitures: Array[Furniture]):
 
   def onClick: Unit = ???
 
@@ -8,4 +8,4 @@ class App(furnitures: Array[Furniture]):
 
   def rotateFurniture(f: Furniture): Unit = ???
 
-  def save() = ???
+  def save() = ??? */
