@@ -44,10 +44,11 @@ object Main extends JFXApp3:
       fitHeight = 580
       fitWidth = 580
       preserveRatio = true
+
 // This is were the image of an floorplan is imported and where the shapes are drawn on
     var floorPlanBox = new StackPane():    //Should we put the on mouse move here??
-      var shapes = Array[Shape]()          // I was thinking of doing an array for shapes?
-                                           // But also I should do something with the furniture class
+      var shapes = Array[Shape]()  // I was thinking of doing an array for shapes?
+      DragController(shapes, true)     ///HOW TO GET THIS WORKKK
       
       
    //How do you even use "onMouseMove" ????

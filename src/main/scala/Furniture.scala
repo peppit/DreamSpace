@@ -1,8 +1,8 @@
 trait Furniture:
 
-  def fits(s: Shape) = true
+  def fits(s: Shape) = true     // onks tää täällä vai GUI:ssa
 
-  def overLapMistake: Boolean = false
+  def overLapMistake: Boolean = false    // Tää kans
 
   def canPutOnto(furniture: Furniture): Boolean
   
