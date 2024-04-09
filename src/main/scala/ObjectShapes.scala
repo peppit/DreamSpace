@@ -1,5 +1,5 @@
-import scalafx.scene.paint.Color
-import scalafx.scene.Node 
+/*import scalafx.scene.paint.Color
+import scalafx.scene.shape.Shape
 
 
 case class EllipseObject(diameterX: Double, diameterY: Double) extends Shape:
@@ -25,3 +25,4 @@ case class RoundObject(diameter: Double, color: Color) extends Shape:
   def area = scala.math.Pi * diameter * diameter
 
 
+*/

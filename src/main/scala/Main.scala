@@ -14,18 +14,21 @@ import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.Includes.jfxDialogPane2sfx
 import scalafx.Includes.jfxNode2sfx
 import scalafx.scene.input.KeyCode.A
-import scalafx.scene.shape.{Circle, Rectangle}
+import scalafx.scene.shape.{Circle, Rectangle, Shape}
 import scalafx.Includes.string2sfxColor
-import scalafx.scene.canvas.Canvas
-import scalafx.scene.input.DragEvent
+import scalafx.scene.input.{DragEvent, MouseDragEvent}
+import scalafx.scene.layout.StackPane
+import scalafx.Includes.jfxPaint2sfx
 
 import java.io.File
+
 
 object Main extends JFXApp3:
 
   var possibleObject: Option[Shape] = None
   var possibleFurniture: Option[String] = None
   var furnitures: Array[Furniture] = Array[Furniture]()
+  val movableWalls = Array[MovableLine]()
 
 
   def start() =
@@ -41,19 +44,19 @@ object Main extends JFXApp3:
 
 // Possible imageview
     var imageView = new ImageView:
-      fitHeight = 580
-      fitWidth = 580
+      fitHeight = 650
+      fitWidth = 650
       preserveRatio = true
+      layoutX = 150
+
 
 // This is were the image of an floorplan is imported and where the shapes are drawn on
-    var floorPlanBox = new StackPane():    //Should we put the on mouse move here??
+    var floorPlanBox = new Pane():    //Should we put the on mouse move here??
       var shapes = Array[Shape]()  // I was thinking of doing an array for shapes?
-      DragController(shapes, true)     ///HOW TO GET THIS WORKKK
-      
-      
-   //How do you even use "onMouseMove" ????
-   // I'm so stuck I don't know what to do. How do I get my shapes moving from dragging the mouse??
-    
+
+
+
+
 
 
 // method for selecting the wanted file
@@ -103,7 +106,7 @@ object Main extends JFXApp3:
         case Some(button) => if button == circleB then
           sizeSelectCircle()
         else if button == rectangleB then
-          sizeSelectRectangle()
+          println("you chose rectangle")
         else if button == ellipseB then
           println("you chose ellipse")
         else if button == halfRB then
@@ -113,11 +116,11 @@ object Main extends JFXApp3:
         case _ => println("No button selected")
         }
 
-
+/*
      // Alert for selecting size and color for rectangle shaped objects
     def sizeSelectRectangle() =
 
-      val dialog = new Dialog[RectangleObject]():
+      val dialog = new Dialog[Rectangle]():
         initOwner(stage)
         title = "Measurements"
         headerText = "Please enter the measurements and wanted colour."
@@ -162,15 +165,15 @@ object Main extends JFXApp3:
 
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
-          RectangleObject(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.text())
+          Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.text())
         else
           null
 
       val result = dialog.showAndWait()
 
       result match
-        case Some(RectangleObject(u,p, c)) =>
-          possibleObject = Some(RectangleObject(u,p, c))
+        case Some(re: Rectangle(u, p, c)) =>
+          possibleObject = Some(Rectangle(u,p, c))
           val r = new Rectangle()
           r.setX(400)
           r.setY(50)
@@ -184,10 +187,12 @@ object Main extends JFXApp3:
 
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
-
+*/
     // Alert for selecting size and color for circle shaped furniture:
     def sizeSelectCircle() =
-      val dialog = new Dialog[RoundObject]():
+      var possibleCircle: Option[Circle]= None
+
+      val dialog = new Dialog[Circle]():
         initOwner(stage)
         title = "Measurements"
         headerText = "Please enter the measurements and wanted colour."
@@ -227,24 +232,26 @@ object Main extends JFXApp3:
 
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
-          RoundObject(diameter.text().toDouble, colorPick.text())
+          possibleCircle = Option(Circle(diameter.text().toDouble, colorPick.text()))
+          Circle(diameter.text().toDouble, colorPick.text())
         else
           null
 
       val result = dialog.showAndWait()
 
       result match
-        case Some(RoundObject(d, c)) =>
-          possibleObject = Some(RoundObject(d, c))
-
+        case Some(c: Circle) =>
           val cir = new Circle()
           cir.setCenterX(400)
           cir.setCenterY(50)
-          cir.setRadius(d/2)
-          cir.fill = c
+          cir.setRadius(possibleCircle.get.radius.toDouble /2)
+          cir.fill = possibleCircle.get.fill.get()
+          val circleFurniture = Furniture(possibleFurniture.get, cir)
+          val drag = new DragController()
+          drag.makeDraggable(circleFurniture)
 
           //furnitures += Furniture(possibleFurniture.get, cir, c)
-          floorPlanBox.children += cir
+          floorPlanBox.children += circleFurniture
 
           println("Sait toimiin")
 
@@ -254,22 +261,26 @@ object Main extends JFXApp3:
     // Buttons for furnitures:
     val tableButton = new Button("Table")
       tableButton.onAction = (event) =>
+        possibleFurniture = Option("Table")
         shapeSelect()
     val bedButton = new Button("Bed")
       bedButton.onAction = (event) =>
         possibleFurniture = Option("Bed")
-        sizeSelectRectangle()
+        //sizeSelectRectangle()
     val carpetButton = new Button("Carpet")
       carpetButton.onAction = (event) => shapeSelect()
     val chairButton = new Button("Chair")
       chairButton.onAction = (event) => sizeSelectCircle()
     val closetButton = new Button("Closet")
-      closetButton.onAction = (event) => sizeSelectRectangle()
+      closetButton.onAction = (event) => () //sizeSelectRectangle()
     val lampButton = new Button("Lamp")
       lampButton.onAction = (event) => sizeSelectCircle()
     val tvButton = new Button("TV")
     val sofaButton = new Button("Sofa")
       sofaButton.onAction = (event) => shapeSelect()
+    val addWall = new Button("Add wall")
+      addWall.layoutX = 400
+ //     addWall.onAction = (event) => MovableLine(floorPlanBox)
 
 
     //This is the original GUI
@@ -281,9 +292,10 @@ object Main extends JFXApp3:
     val label = new Label("Design your dream home!")
     label.font = Font(18)
 
-    val topBox = new VBox:
+    val topBox = new HBox:
+      spacing = 60
       background = Background.fill(White)
-      children = Array(label)
+      children = Array(label, addWall)
 
     root.add(sideLBox, 0, 0, 1, 2)
     root.add(topBox, 1, 0, 1, 1)

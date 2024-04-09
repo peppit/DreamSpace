@@ -1,5 +1,3 @@
-import scalafx.scene.Node
-
-trait Shape extends Node:
+//trait Shape:
   
-  def area: Double
+  //def area: Double
