@@ -1,9 +1,6 @@
-Kuinka yhdistän furnituren näytölle???
-
-Ehdotuksia: StackPanella saa ehkä samoin canvasilla voisi onnistua??
-
-Se vaan et, jos stackpanella lähtee tekeen ongelmana on että en tiiä miten piirtää ja asettaa enää niitä grafiikoita oikein siihe GUI:hin. 
-
-Laitoin koodiin kohdat missä jumittaaaa. 
+DragContoller.scalassa ongelma kun siirtää ensimmäistä kertaa. 
+Miten tunnistaa toisen huonekalun onko se päällä vai ei? Onko toi mun idea ihan huono?
+Miksi Main luokassa arrayhyn "furnitures" (ihan alussa) ei voi lisätä furnitureja????
+ 
 
 

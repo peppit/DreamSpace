@@ -1,3 +1,4 @@
+import Main.stage
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.value.ChangeListener
@@ -6,9 +7,12 @@ import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import scalafx.beans.property.DoubleProperty
 import scalafx.Includes.jfxNode2sfx
+import scalafx.scene.control.Alert
+import scalafx.scene.control.Alert.AlertType
 
 import scala.language.postfixOps
 import scalafx.scene.shape.{Circle, Shape}
+import scalafx.Includes.jfxDialogPane2sfx
 
 
 class DragController:
@@ -21,23 +25,41 @@ class DragController:
   private var previousX: Double = 0
   private var cycleStatus: Double = 0    //when cycleStatus is 0 it's INACTIVE, when 1 it's ACTIVE
 
+  private var forTheFirstMove = 0
+
 
   def createHandlers(target: Furniture) =
+
+    //Alert that pops up if the furniture is in a place where it's not possible to be.
+    val overLapMistake = new Alert(AlertType.Error):
+      initOwner(stage)
+      title = "Exception Dialog"
+      headerText = "Overlap mistake."
+      contentText = "You can not put this furniture here!"
+      // Set expandable Exception into the dialog pane.
+      //dialogPane().expandableContent = expContent
+  //  .showAndWait()
+
     val shape = target.shapeOut
     shape.onMousePressed = (event) =>
       if (event.isPrimaryButtonDown) then
         cycleStatus = 1
         anchorY = event.getSceneY
         anchorX = event.getSceneX
+        println(anchorX.toString + "this is Ax" + anchorY.toString + "this is Ay")
        // previousX = shape.getLayoutX
      //   previousY = shape.getLayoutY
-        yOffset = target.y - anchorY
+        yOffset = target.y - anchorY    // ongelma on tässä, jotenki kooordinaatit tosi erit
         xOffset = target.x -anchorX
+        println(xOffset.toString + "this is Ox" + xOffset.toString + "this is Oy")
+
       else if  event.isSecondaryButtonDown then
         cycleStatus = 1
         shape.setTranslateX(0)
         shape.setTranslateY(0)
       else ()
+    forTheFirstMove += 1
+
 
     shape.setOnMouseDragged((event: MouseEvent) =>
       if (cycleStatus != 0) then
@@ -52,36 +74,8 @@ class DragController:
         target.y = event.getSceneY + yOffset
         shape.setTranslateX(0)
         shape.setTranslateY(0)
+
         println(shape.getLayoutX.toString + ", " + shape.getLayoutY.toString))
 
-
-/*  def createDraggableProperty(target: Furniture) =
-    val shape = target.shapeOut
-    var isDraggable = new SimpleBooleanProperty()
-    isDraggable.addListener(observalbe, oldValue, newValue)
-*/
-
-
-  def makeDraggable(target: Furniture): Unit =
-    val shape = target.shapeOut
-
-    shape.onMousePressed = (event) =>
-      anchorY = event.getSceneY
-      anchorX = event.getSceneX
-      previousX = shape.getLayoutX
-      previousY = shape.getLayoutY
-      yOffset = target.x - anchorY
-      xOffset = target.x -anchorX
-
-    shape.setOnMouseDragged((event: MouseEvent) =>
-      shape.setTranslateX(event.getSceneX - anchorX)
-      shape.setTranslateY(event.getSceneY - anchorY))
-
-    shape.setOnMouseReleased((event: MouseEvent) =>
-      println(shape.getLayoutX.toString + ", " + shape.getLayoutY.toString)
-      shape.setLayoutY(event.getSceneY + yOffset)
-      shape.setLayoutX(event.getSceneX + xOffset)
-      target.x = event.getSceneX + xOffset
-      target.x = event.getSceneY + yOffset)
 
 

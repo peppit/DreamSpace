@@ -52,11 +52,7 @@ object Main extends JFXApp3:
 
 // This is were the image of an floorplan is imported and where the shapes are drawn on
     var floorPlanBox = new Pane():    //Should we put the on mouse move here??
-      var shapes = Array[Shape]()  // I was thinking of doing an array for shapes?
-
-
-
-
+      var furnitures = Array[Furniture]()  // I was thinking of doing an array for shapes?
 
 
 // method for selecting the wanted file
@@ -259,10 +255,8 @@ object Main extends JFXApp3:
           circleFurniture.y = 50
           val drag = new DragController()
           drag.createHandlers(circleFurniture)
-
-          //furnitures += Furniture(possibleFurniture.get, cir, c)
           floorPlanBox.children += circleFurniture
-
+        //  furnitures += circleFurniture   // Miten niin Array:hyn ei voi lisätä?
           println("Sait toimiin")
 
         case None => println("Dialog returned: None")
@@ -278,19 +272,24 @@ object Main extends JFXApp3:
         possibleFurniture = Option("Bed")
         sizeSelectRectangle()
     val carpetButton = new Button("Carpet")
+      possibleFurniture = Option("Carpet")
       carpetButton.onAction = (event) => shapeSelect()
     val chairButton = new Button("Chair")
+      possibleFurniture = Option("Chair")
       chairButton.onAction = (event) => sizeSelectCircle()
     val closetButton = new Button("Closet")
+      possibleFurniture = Option("Closet")
       closetButton.onAction = (event) => sizeSelectRectangle()
     val lampButton = new Button("Lamp")
+      possibleFurniture = Option("Lamp")
       lampButton.onAction = (event) => sizeSelectCircle()
     val tvButton = new Button("TV")
     val sofaButton = new Button("Sofa")
+      possibleFurniture = Option("Sofa")
       sofaButton.onAction = (event) => shapeSelect()
     val addWall = new Button("Add wall")
       addWall.layoutX = 400
- //     addWall.onAction = (event) => MovableLine(floorPlanBox)
+      addWall.onAction = (event) => MovableLine(floorPlanBox)
 
 
     //This is the original GUI

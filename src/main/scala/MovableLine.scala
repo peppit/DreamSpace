@@ -10,12 +10,21 @@ import scala.language.postfixOps
 
 class MovableLine(pane: Pane) {
 
+  private var anchorX: Double = 0
+  private var anchorY: Double = 0
+  private var yOffset: Double = 0
+  private var xOffset: Double = 0
+  private var previousY: Double = 0
+  private var previousX: Double = 0
+  private var cycleStatus: Double = 0
+
+
   var startX0 = 200
   var startY0 = 200
   var endX0 = 300
   var endY0 = 200
 
-  var line = new Line:
+  var line = new Line:   //Line witch is the "wall"
     startX = startX0
     startY = startY0
     endX = endX0
@@ -32,8 +41,20 @@ class MovableLine(pane: Pane) {
     point
   }
 
-  val startPoint = createDraggablePoint(startX0, startY0)
-  val endPoint = createDraggablePoint(endX0, endY0)
+  val startPoint = createDraggablePoint(startX0, startY0)   //the starting point of the line
+  val endPoint = createDraggablePoint(endX0, endY0)        // the end of the line.
+
+  startPoint.onMousePressed = (event) =>
+    if (event.isPrimaryButtonDown) then
+        cycleStatus = 1
+        anchorY = event.getSceneY
+        anchorX = event.getSceneX
+        yOffset = startY0 - anchorY
+        xOffset = startX0 -anchorX
+    else if  event.isSecondaryButtonDown then
+        cycleStatus = 1
+        startPoint.setTranslateX(0)
+        startPoint.setTranslateY(0)
 
   startPoint.onMouseDragged = (event: MouseEvent) =>{
     val newX = event.x
@@ -43,10 +64,22 @@ class MovableLine(pane: Pane) {
     startPoint.centerY = newY
     updateline()
   }
-  endPoint.onMouseDragged = (event: MouseEvent) => handlePointMouseDragged(event, line, false)
+  startPoint.onMouseDragged = (event: MouseEvent) =>{
+    val newX = event.x
+    val newY = event.y
+    //if (newX >= startX0 && newX <= endX0) then
+    endPoint.centerX = newX
+    endPoint.centerY = newY
+    updateline()
+  }
+  
+ // endPoint.onMouseDragged = (event: MouseEvent) => handlePointMouseDragged(event, line, false)
 
   //startPoint.onMouseDragged = (event: MouseEvent) => handlePointMouseDragged(event, line, true)
   //endPoint.onMouseDragged = (event: MouseEvent) => handlePointMouseDragged(event, line, false)
+  
+  endPoint.onMouseReleased = (event: MouseEvent) => handlePointMouseReleased(event, line, false)
+  startPoint.onMouseReleased = (event: MouseEvent) => handlePointMouseReleased(event, line, true)
 
   pane.children.addAll(line, startPoint, endPoint)
 
@@ -57,7 +90,7 @@ class MovableLine(pane: Pane) {
     line.endY = endPoint.centerX.value
 
 
-  def handlePointMouseDragged(event: MouseEvent, line: Line, isStartPoint: Boolean): Unit = {
+  def handlePointMouseReleased(event: MouseEvent, line: Line, isStartPoint: Boolean): Unit = {
     val point = event.getSource.asInstanceOf[javafx.scene.shape.Circle]
     val offsetX = event.y
     val offsetY = event.x
@@ -81,7 +114,7 @@ class MovableLine(pane: Pane) {
   }
 
 
-}
+  }
 /*
  //  public void createDraggableLine(Pane root){
      //Create the line
