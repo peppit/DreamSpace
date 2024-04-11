@@ -106,7 +106,7 @@ object Main extends JFXApp3:
         case Some(button) => if button == circleB then
           sizeSelectCircle()
         else if button == rectangleB then
-          println("you chose rectangle")
+          sizeSelectRectangle()
         else if button == ellipseB then
           println("you chose ellipse")
         else if button == halfRB then
@@ -116,9 +116,11 @@ object Main extends JFXApp3:
         case _ => println("No button selected")
         }
 
-/*
+
      // Alert for selecting size and color for rectangle shaped objects
     def sizeSelectRectangle() =
+
+      var possibleRect: Option[Rectangle] = None
 
       val dialog = new Dialog[Rectangle]():
         initOwner(stage)
@@ -165,6 +167,7 @@ object Main extends JFXApp3:
 
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
+          possibleRect = Option(Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.text()))
           Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.text())
         else
           null
@@ -172,22 +175,27 @@ object Main extends JFXApp3:
       val result = dialog.showAndWait()
 
       result match
-        case Some(re: Rectangle(u, p, c)) =>
-          possibleObject = Some(Rectangle(u,p, c))
+        case Some(re: Rectangle) =>
           val r = new Rectangle()
           r.setX(400)
           r.setY(50)
-          r.setWidth(u)
-          r.setHeight(p)
-          r.fill = c
+          r.setWidth(possibleRect.get.width.toDouble)
+          r.setHeight(possibleRect.get.height.toDouble)
+          r.fill = possibleRect.get.fill.get()
 
-          floorPlanBox.children += r   //Here we add the shape to the picture
+          val RectangleFurniture = Furniture(possibleFurniture.get, r)
+          RectangleFurniture.x = 400
+          RectangleFurniture.y = 50
+          val drag = new DragController()
+          drag.createHandlers(RectangleFurniture)
+
+          floorPlanBox.children += RectangleFurniture   //Here we add the shape to the picture
 
           println("Sait toimiin")
 
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
-*/
+
     // Alert for selecting size and color for circle shaped furniture:
     def sizeSelectCircle() =
       var possibleCircle: Option[Circle]= None
@@ -247,8 +255,10 @@ object Main extends JFXApp3:
           cir.setRadius(possibleCircle.get.radius.toDouble /2)
           cir.fill = possibleCircle.get.fill.get()
           val circleFurniture = Furniture(possibleFurniture.get, cir)
+          circleFurniture.x = 400
+          circleFurniture.y = 50
           val drag = new DragController()
-          drag.makeDraggable(circleFurniture)
+          drag.createHandlers(circleFurniture)
 
           //furnitures += Furniture(possibleFurniture.get, cir, c)
           floorPlanBox.children += circleFurniture
@@ -266,13 +276,13 @@ object Main extends JFXApp3:
     val bedButton = new Button("Bed")
       bedButton.onAction = (event) =>
         possibleFurniture = Option("Bed")
-        //sizeSelectRectangle()
+        sizeSelectRectangle()
     val carpetButton = new Button("Carpet")
       carpetButton.onAction = (event) => shapeSelect()
     val chairButton = new Button("Chair")
       chairButton.onAction = (event) => sizeSelectCircle()
     val closetButton = new Button("Closet")
-      closetButton.onAction = (event) => () //sizeSelectRectangle()
+      closetButton.onAction = (event) => sizeSelectRectangle()
     val lampButton = new Button("Lamp")
       lampButton.onAction = (event) => sizeSelectCircle()
     val tvButton = new Button("TV")

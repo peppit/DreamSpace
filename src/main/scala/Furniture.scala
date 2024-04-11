@@ -3,8 +3,8 @@ import scalafx.scene.shape.Shape
 
 class Furniture(name: String, shape: Shape) extends Shape(shape):
   
-  var x = layoutX.toDouble
-  var y = layoutY.toDouble
+  var x: Double = 0
+  var y: Double = 0
   
   val shapeOut = shape
   
@@ -12,8 +12,8 @@ class Furniture(name: String, shape: Shape) extends Shape(shape):
 
   def overLapMistake: Boolean = false    // Tää kans
   
-  this.translateY = y
-  this.translateX = x
+  layoutX = y
+  layoutY = x
 
  // def canPutOnto(furniture: Furniture): Boolean = 
   
