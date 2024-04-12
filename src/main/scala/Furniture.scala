@@ -4,17 +4,20 @@ class Furniture(name: String, shape: Shape) extends Shape(shape):
 
   val nameOut = name
   
-  var x: Double = 0
-  var y: Double = 0
+  var x: Double = 400
+  var y: Double = 50
   
   val shapeOut = shape
   
   def fits(s: Shape) = true     // onks tää täällä vai GUI:ssa
 
   def overLapMistake: Boolean =
-    if name == "Carpet" && Main.furnitures.exists(f => f.intersects(this.getLayoutBounds)) then
+    val thisFurnitureOut = Main.furnitures.filter( f => f != this)
+    if nameOut == "Carpet" && thisFurnitureOut.exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
+      println(" 1 ")
       true
-    else if name != "Lamp" && name != "Carpet" && Main.furnitures.filter(f => f.nameOut != "Lamp" && f.nameOut != "Carpet" ).exists(f => f.intersects(this.getLayoutBounds)) then
+    else if nameOut != "Lamp" && nameOut != "Carpet" && thisFurnitureOut.filter(f => f.nameOut != "Lamp" && f.nameOut != "Carpet" ).exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
+      println(" 2 ")
       true
     else false
 

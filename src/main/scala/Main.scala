@@ -184,7 +184,8 @@ object Main extends JFXApp3:
           RectangleFurniture.y = 50
           val drag = new DragController()
           drag.createHandlers(RectangleFurniture)
-
+          
+          furnitures = RectangleFurniture +: furnitures
           floorPlanBox.children += RectangleFurniture   //Here we add the shape to the picture
 
           println("Sait toimiin")

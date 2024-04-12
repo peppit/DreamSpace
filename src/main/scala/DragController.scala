@@ -31,7 +31,7 @@ class DragController:
   def createHandlers(target: Furniture) =
 
     //Alert that pops up if the furniture is in a place where it's not possible to be.
-    val overLapMistake = new Alert(AlertType.Error):
+    val overLapMistakeAlert = new Alert(AlertType.Error):
       initOwner(stage)
       title = "Exception Dialog"
       headerText = "Overlap mistake."
@@ -42,6 +42,8 @@ class DragController:
 
     val shape = target.shapeOut
     shape.onMousePressed = (event) =>
+      previousX = event.getSceneX
+      previousY = event.getSceneY
       if (event.isPrimaryButtonDown) then
         cycleStatus = 1
         anchorY = event.getSceneY
@@ -49,10 +51,14 @@ class DragController:
         println(anchorX.toString + "this is Ax" + anchorY.toString + "this is Ay")
        // previousX = shape.getLayoutX
      //   previousY = shape.getLayoutY
-        yOffset = target.y - anchorY    // ongelma on tässä, jotenki kooordinaatit tosi erit
-        xOffset = target.x -anchorX
-        println(xOffset.toString + "this is Ox" + xOffset.toString + "this is Oy")
-
+        if forTheFirstMove != 0 then
+          yOffset = target.y - anchorY    // ongelma on tässä, jotenki kooordinaatit tosi erit
+          xOffset = target.x -anchorX
+          println(xOffset.toString + "this is Ox" + xOffset.toString + "this is Oy")
+        else
+          yOffset = shape.layoutBounds().getMaxY - anchorY
+          xOffset = shape.layoutBounds().getMaxX - anchorX
+          
       else if  event.isSecondaryButtonDown then
         cycleStatus = 1
         shape.setTranslateX(0)
@@ -67,13 +73,19 @@ class DragController:
         shape.setTranslateY(event.getSceneY - anchorY))
 
     shape.setOnMouseReleased((event: MouseEvent) =>
-        println(shape.getLayoutX.toString + ", " + shape.getLayoutY.toString)
-        shape.setLayoutY(event.getSceneY + yOffset)
-        shape.setLayoutX(event.getSceneX + xOffset)
-        target.x = event.getSceneX + xOffset
-        target.y = event.getSceneY + yOffset
-        shape.setTranslateX(0)
-        shape.setTranslateY(0)
+        if target.overLapMistake then
+          overLapMistakeAlert.showAndWait()
+          shape.setLayoutY(previousY)
+          shape.setLayoutX(previousX) 
+        else 
+          println(shape.getLayoutX.toString + ", " + shape.getLayoutY.toString)
+          shape.setLayoutY(event.getSceneY + yOffset)
+          shape.setLayoutX(event.getSceneX + xOffset)
+          target.x = event.getSceneX + xOffset
+          target.y = event.getSceneY + yOffset
+          shape.setTranslateX(0)
+          shape.setTranslateY(0)
+
 
         println(shape.getLayoutX.toString + ", " + shape.getLayoutY.toString))
 
