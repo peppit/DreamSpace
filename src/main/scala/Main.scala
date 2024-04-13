@@ -4,7 +4,7 @@ import scalafx.scene.{Scene, image}
 import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, StackPane, VBox}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.ButtonBar.ButtonData
-import scalafx.scene.control.{Alert, Button, ButtonType, Dialog, Label, Menu, MenuBar, MenuItem, TextField}
+import scalafx.scene.control.{Alert, Button, ButtonType, ColorPicker, Dialog, Label, Menu, MenuBar, MenuItem, TextField}
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.*
@@ -14,13 +14,15 @@ import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.Includes.jfxDialogPane2sfx
 import scalafx.Includes.jfxNode2sfx
 import scalafx.scene.input.KeyCode.A
-import scalafx.scene.shape.{Circle, Rectangle, Shape}
+import scalafx.scene.shape.{Circle, Ellipse, Rectangle, Shape}
 import scalafx.Includes.string2sfxColor
 import scalafx.scene.input.{DragEvent, MouseDragEvent}
 import scalafx.scene.layout.StackPane
 import scalafx.Includes.jfxPaint2sfx
+import scalafx.Includes.jfxColor2sfx
 
 import java.io.File
+
 
 
 object Main extends JFXApp3:
@@ -51,8 +53,8 @@ object Main extends JFXApp3:
 
 
 // This is were the image of an floorplan is imported and where the shapes are drawn on
-    var floorPlanBox = new Pane():    //Should we put the on mouse move here??
-      var furnitures = Array[Furniture]()  // I was thinking of doing an array for shapes?
+    var floorPlanBox = new Pane():
+      var furnitures = Array[Furniture]()
 
 
 // method for selecting the wanted file
@@ -70,13 +72,29 @@ object Main extends JFXApp3:
           else
             println("No file selected")
 
-
-    val fileNew = MenuItem("New")
+    val fileNew = MenuItem("New")                 //Button for selecting new file
       fileNew.onAction = (event) => selectFile()
+
+
+
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //HERE IS THE PROBLEM
+    val menuItemSave = new MenuItem("Save")
+    menuItemSave.onAction = (event) =>
+      val fileChooser = new FileChooser:
+            title = "Save your file."
+            extensionFilters.add(ExtensionFilter("PNG", Seq("*.png")))
+      fileChooser.showSaveDialog(stage)
+    /// WHY DOESN'T it save the stage??
+
+
+
 
     //Here is the button for filechooser
     val menu = new Menu("File"):
-      items = Array(fileNew, MenuItem("Save"))
+      items = Array(fileNew, menuItemSave)
 
     val top = new MenuBar:
       menus = Array(menu)
@@ -104,7 +122,7 @@ object Main extends JFXApp3:
         else if button == rectangleB then
           sizeSelectRectangle()
         else if button == ellipseB then
-          println("you chose ellipse")
+          sizeSelectEllipse()
         else if button == halfRB then
           println("you chose half round")
         else
@@ -132,8 +150,7 @@ object Main extends JFXApp3:
       val sideL2 = new TextField():
         promptText = "lenght in cm"
 
-      val colorPick = new TextField():
-        promptText = "Write the first letter with caps"
+      val colorPick = new ColorPicker()
 
       val grid = new GridPane():
          hgap = 10
@@ -163,8 +180,8 @@ object Main extends JFXApp3:
 
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
-          possibleRect = Option(Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.text()))
-          Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.text())
+          possibleRect = Option(Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.getValue))
+          Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.getValue)
         else
           null
 
@@ -208,8 +225,7 @@ object Main extends JFXApp3:
       val diameter = new TextField():
         promptText = "diameter in cm"
 
-      val colorPick = new TextField():
-        promptText = "Write the first letter with caps"
+      val colorPick = new ColorPicker()
 
       val grid = new GridPane():
          hgap = 10
@@ -227,9 +243,6 @@ object Main extends JFXApp3:
       diameter.text.onChange { (_, _, newValue) =>
         confirmButton.disable = newValue.trim().isEmpty
       }
-      colorPick.text.onChange { (_, _, newValue) =>
-        confirmButton.disable = newValue.trim().isEmpty
-      }
 
       dialog.dialogPane().content = grid
 
@@ -237,8 +250,8 @@ object Main extends JFXApp3:
 
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
-          possibleCircle = Option(Circle(diameter.text().toDouble, colorPick.text()))
-          Circle(diameter.text().toDouble, colorPick.text())
+          possibleCircle = Option(Circle(diameter.text().toDouble, colorPick.getValue))
+          Circle(diameter.text().toDouble, colorPick.getValue)
         else
           null
 
@@ -257,11 +270,87 @@ object Main extends JFXApp3:
           val drag = new DragController()
           drag.createHandlers(circleFurniture)
           floorPlanBox.children += circleFurniture
-        //  furnitures += circleFurniture   // Miten niin Array:hyn ei voi lisätä?
+          furnitures = circleFurniture +: furnitures
           println("Sait toimiin")
 
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
+
+        // Alert for selecting size and color for circle shaped furniture:
+    def sizeSelectEllipse() =
+      var possibleEllipse: Option[Ellipse]= None
+      var possibleColor: Option[Color] = None
+
+      val dialog = new Dialog[Ellipse]():
+        initOwner(stage)
+        title = "Measurements"
+        headerText = "Please enter the measurements and wanted colour."
+
+      val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
+      dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
+
+      val diameterX = new TextField():
+        promptText = "diameter in cm"
+
+      val diameterY = new TextField():
+        promptText = "diameter in cm"
+
+      val colorPick = new ColorPicker()
+
+      val grid = new GridPane():
+         hgap = 10
+         vgap = 10
+         padding = Insets(20, 100, 10, 10)
+         add(new Label("Diameter x in cm:"), 0, 0)
+         add(diameterX, 1,0)
+         add(new Label("Diameter y in cm:"), 0, 1)
+         add(diameterY, 1,1)
+         add(new Label("Color:"), 0, 2)
+         add(colorPick, 1, 2)
+
+      val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
+      confirmButton.disable = true
+
+      diameterX.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+      diameterY.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+
+      dialog.dialogPane().content = grid
+
+      Platform.runLater(diameterX.requestFocus())
+
+      dialog.resultConverter = dialogButton =>
+        if (dialogButton == confirmButtonType) then
+          possibleEllipse = Option(Ellipse(diameterX.text().toDouble/2, diameterY.text().toDouble/2))
+          possibleColor = Option(colorPick.getValue)
+          Ellipse(diameterX.text().toDouble/2, diameterY.text().toDouble/2)
+        else
+          null
+
+      val result = dialog.showAndWait()
+
+      result match
+        case Some(c: Ellipse) =>
+          val el = new Ellipse()
+          el.setCenterX(400)
+          el.setCenterY(50)
+          el.setRadiusX(possibleEllipse.get.radiusX.toDouble)
+          el.setRadiusY(possibleEllipse.get.radiusY.toDouble)
+          el.fill = possibleColor.get
+          val ellipseFurniture = Furniture(possibleFurniture.get, el)
+          ellipseFurniture.x = 400
+          ellipseFurniture.y = 50
+          val drag = new DragController()
+          drag.createHandlers(ellipseFurniture)
+          floorPlanBox.children += ellipseFurniture
+          furnitures = ellipseFurniture +: furnitures
+          println("Sait toimiin")
+        case None => println("Dialog returned: None")
+        case _ => println("something else happened")
+
 
     // Buttons for furnitures:
     val tableButton = new Button("Table")
