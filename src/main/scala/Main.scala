@@ -154,9 +154,9 @@ object Main extends JFXApp3:
          vgap = 10
          padding = Insets(20, 100, 10, 10)
 
-         add(new Label("Side 1 lenght:"), 0, 0)
+         add(new Label("Width:"), 0, 0)
          add(sideL1, 1,0)
-         add(new Label("Side 2 lenght:"), 0, 1)
+         add(new Label("Height:"), 0, 1)
          add(sideL2,1,1)
          add(new Label("Color:"), 0, 2)
          add(colorPick, 1, 2)

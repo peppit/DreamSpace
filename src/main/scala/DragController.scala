@@ -49,22 +49,21 @@ class DragController:
         anchorY = event.getSceneY
         anchorX = event.getSceneX
         println(anchorX.toString + "this is Ax" + anchorY.toString + "this is Ay")
-       // previousX = shape.getLayoutX
-     //   previousY = shape.getLayoutY
+
         if forTheFirstMove != 0 then
-          yOffset = target.y - anchorY    // ongelma on tässä, jotenki kooordinaatit tosi erit
-          xOffset = target.x -anchorX
+          yOffset = target.y - anchorY
+          xOffset = target.x - anchorX
           println(xOffset.toString + "this is Ox" + xOffset.toString + "this is Oy")
         else
-          yOffset = shape.layoutBounds().getMaxY - anchorY
-          xOffset = shape.layoutBounds().getMaxX - anchorX
+          yOffset = shape.getLayoutY - anchorY
+          xOffset = shape.getLayoutX - anchorX
           
       else if  event.isSecondaryButtonDown then
         cycleStatus = 1
         shape.setTranslateX(0)
         shape.setTranslateY(0)
       else ()
-    forTheFirstMove += 1
+      forTheFirstMove += 1
 
 
     shape.setOnMouseDragged((event: MouseEvent) =>
@@ -75,9 +74,11 @@ class DragController:
     shape.setOnMouseReleased((event: MouseEvent) =>
         if target.overLapMistake then
           overLapMistakeAlert.showAndWait()
-          shape.setLayoutY(previousY)
-          shape.setLayoutX(previousX) 
-        else 
+          shape.setLayoutY(previousY + yOffset)
+          shape.setLayoutX(previousX + xOffset) 
+          shape.setTranslateX(0)
+          shape.setTranslateY(0)
+        else
           println(shape.getLayoutX.toString + ", " + shape.getLayoutY.toString)
           shape.setLayoutY(event.getSceneY + yOffset)
           shape.setLayoutX(event.getSceneX + xOffset)
@@ -85,6 +86,8 @@ class DragController:
           target.y = event.getSceneY + yOffset
           shape.setTranslateX(0)
           shape.setTranslateY(0)
+
+        forTheFirstMove += 1
 
 
         println(shape.getLayoutX.toString + ", " + shape.getLayoutY.toString))

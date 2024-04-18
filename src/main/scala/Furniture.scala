@@ -4,8 +4,8 @@ class Furniture(name: String, shape: Shape) extends Shape(shape):
 
   val nameOut = name
   
-  var x: Double = 400
-  var y: Double = 50
+  var x: Double = this.shape.getLayoutX
+  var y: Double = this.shape.getLayoutY
   
   val shapeOut = shape
   
