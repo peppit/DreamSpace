@@ -105,14 +105,13 @@ object Main extends JFXApp3:
       val circleB = new ButtonType("Circle")
       val rectangleB = new ButtonType("Rectangle")
       val ellipseB = new ButtonType("Ellipse")
-      val halfRB = new ButtonType("Half Round")
 
       val select = new Alert(AlertType.Confirmation):
         initOwner(stage)
         title = "Selecting shape"
         headerText = "First select shape!"
         contentText = "Choose your option."
-        buttonTypes = Seq(circleB, rectangleB, ellipseB, halfRB, ButtonType.Cancel)
+        buttonTypes = Seq(circleB, rectangleB, ellipseB, ButtonType.Cancel)
 
       val result = select.showAndWait()
 
@@ -123,8 +122,6 @@ object Main extends JFXApp3:
           sizeSelectRectangle()
         else if button == ellipseB then
           sizeSelectEllipse()
-        else if button == halfRB then
-          println("you chose half round")
         else
           println("you chose cancel")
         case _ => println("No button selected")
@@ -204,7 +201,7 @@ object Main extends JFXApp3:
           
           furnitures = RectangleFurniture +: furnitures
           floorPlanBox.children += RectangleFurniture   //Here we add the shape to the picture
-
+          println(RectangleFurniture.nameOut)
           println("Sait toimiin")
 
         case None => println("Dialog returned: None")
@@ -271,6 +268,7 @@ object Main extends JFXApp3:
           drag.createHandlers(circleFurniture)
           floorPlanBox.children += circleFurniture
           furnitures = circleFurniture +: furnitures
+          println(circleFurniture.nameOut)
           println("Sait toimiin")
 
         case None => println("Dialog returned: None")
@@ -347,7 +345,7 @@ object Main extends JFXApp3:
           drag.createHandlers(ellipseFurniture)
           floorPlanBox.children += ellipseFurniture
           furnitures = ellipseFurniture +: furnitures
-          println("Sait toimiin")
+          println(ellipseFurniture.nameOut)
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
 
@@ -362,21 +360,27 @@ object Main extends JFXApp3:
         possibleFurniture = Option("Bed")
         sizeSelectRectangle()
     val carpetButton = new Button("Carpet")
-      possibleFurniture = Option("Carpet")
-      carpetButton.onAction = (event) => shapeSelect()
+      carpetButton.onAction = (event) =>
+        possibleFurniture = Option("Carpet")
+        shapeSelect()
     val chairButton = new Button("Chair")
-      possibleFurniture = Option("Chair")
-      chairButton.onAction = (event) => sizeSelectCircle()
+      chairButton.onAction = (event) =>
+        possibleFurniture = Option("Chair")
+        sizeSelectCircle()
     val closetButton = new Button("Closet")
       possibleFurniture = Option("Closet")
-      closetButton.onAction = (event) => sizeSelectRectangle()
+      closetButton.onAction = (event) =>
+        possibleFurniture = Option("Closet")
+        sizeSelectRectangle()
     val lampButton = new Button("Lamp")
-      possibleFurniture = Option("Lamp")
-      lampButton.onAction = (event) => sizeSelectCircle()
+      lampButton.onAction = (event) =>
+        possibleFurniture = Option("Lamp")
+        sizeSelectCircle()
     val tvButton = new Button("TV")
     val sofaButton = new Button("Sofa")
-      possibleFurniture = Option("Sofa")
-      sofaButton.onAction = (event) => shapeSelect()
+      sofaButton.onAction = (event) =>
+        possibleFurniture = Option("Sofa")
+        shapeSelect()
     val addWall = new Button("Add wall")
       addWall.layoutX = 400
       addWall.onAction = (event) => MovableLine(floorPlanBox)
