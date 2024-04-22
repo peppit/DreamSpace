@@ -1,4 +1,4 @@
-import scalafx.application.{JFXApp3, Platform}
+import scalafx.application.{JFXApp, JFXApp3, Platform}
 import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.{Scene, image}
 import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, StackPane, VBox}
@@ -28,7 +28,17 @@ import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.{Files, Paths}
 import scala.collection.mutable
-import upickle.default.{ReadWriter => RW, macroRW}
+
+import java.awt.image.BufferedImage
+import java.io.File
+import javax.imageio.ImageIO
+import scalafx.application.JFXApp
+import scalafx.collections.ObservableBuffer
+import scalafx.embed.swing.SwingFXUtils
+import scalafx.geometry.Side
+import scalafx.Includes._
+import scalafx.scene.{Node, Scene}
+import scalafx.scene.chart.{CategoryAxis, LineChart, NumberAxis, XYChart}
 
 
 
@@ -39,33 +49,7 @@ object Main extends JFXApp3:
   var possibleObject: Option[Shape] = None   //Option for storing the info, which shape did the user pick for the furniture
   var furnitures: Array[Furniture] = Array[Furniture]() //Array for storing the furnitures
   val movableWalls = Array[MovableLine]() //Array for storing the walls
-  val furnituresForData = mutable.Buffer[FurnitureData]()
-  var pictureForData: Option[ImageView] = None
 
-  //SIIS MITEN???
-  case class Data(val picture: ImageView, val furnitures: mutable.Buffer[FurnitureData])
-  case class FurnitureData(val shape: Shape, val color: Color, val xPos: Double, val yPos: Double)
-  case class SaveFormat(
-    val data: List[Data]
-  )
-  object SaveFormat:
-    implicit val rw: RW[SaveFormat] = macroRW
-
-  def saveData() =
-    for f <- furnitures do
-      furnituresForData += FurnitureData(f.shapeOut,f.colorOut, f.x, f.y)
-    Data(pictureForData.get, furnituresForData)
-
-  def saveFormat(appData: Data) =
-
-    val updatedData = SaveFormat(List(appData))
-
-    val writer = Files.newBufferedWriter(Paths.get("./src/main/savedData.json"), Charset.forName("UTF-8"))
-
-    unpickle.default.writeTo[SaveFormat](updatedData, writer, 2)
-    writer.close()
-
-//unpicklee ei löydy :(
 
   def start() =
 
@@ -84,7 +68,6 @@ object Main extends JFXApp3:
       fitWidth = 650
       preserveRatio = true
       layoutX = 150
-    pictureForData = Some(imageView)   //save this imageView for data.
 
 // This is were the image of an floorplan is imported and where the shapes are drawn on
     var floorPlanBox = new Pane()
@@ -101,7 +84,6 @@ object Main extends JFXApp3:
 
           if selectedFile != null then
             imageView.image = new Image(selectedFile.toURI.toString)
-            pictureForData = Some(imageView)
             floorPlanBox.children.add(imageView)
           else
             println("No file selected")
@@ -109,21 +91,25 @@ object Main extends JFXApp3:
     val fileNew = MenuItem("New")                 //Button for selecting new file
       fileNew.onAction = (event) => selectFile()
 
-
-
-
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //HERE IS THE PROBLEM
+// Here is the menu item for saving the file as a picture.
     val menuItemSave = new MenuItem("Save")
 
     menuItemSave.onAction = (event) =>
-      val fileChooser = new FileChooser:
+      val fileSaver = new FileChooser:
             title = "Save your file."
             extensionFilters.add(ExtensionFilter("PNG", Seq("*.png")))
-      fileChooser.showSaveDialog(stage)
-    /// WHY DOESN'T it save the stage??
+      val selectedFile = fileSaver.showSaveDialog(stage)
+      if selectedFile != null then
+        takeSnapshot(floorPlanBox, selectedFile) // Pass floorPlanBox and selectedFile to takeSnapshot
+      else
+        println("No file selected")
 
+    //method for taking the shot of the scene
+    def takeSnapshot(node: Node, file: File) =
+      val image = node.snapshot(null, null)
+      val bufferedImage = SwingFXUtils.fromFXImage(image, null)
+      assert(bufferedImage ne null)
+      ImageIO.write(bufferedImage, "png", file)
 
 
 
@@ -150,9 +136,10 @@ object Main extends JFXApp3:
 
       val result = select.showAndWait()
 
+      //Here we match the users choise so we get the next alert and the furniture on to the picture
       result match {
         case Some(button) => if button == circleB then
-          sizeSelect().sizeSelectCircle match
+          sizeSelect().sizeSelectCircle match  //circle furniture out
             case (f: Furniture) =>
               floorPlanBox.children += f
               furnitures = f +: furnitures
@@ -161,7 +148,7 @@ object Main extends JFXApp3:
             case _ => println("Something went wrong")
 
         else if button == rectangleB then
-          sizeSelect().sizeSelectRectangle match
+          sizeSelect().sizeSelectRectangle match  //rectangle furniture out
             case (f: Furniture) =>
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
@@ -171,7 +158,7 @@ object Main extends JFXApp3:
 
 
         else if button == ellipseB then
-          sizeSelect().sizeSelectEllipse match
+          sizeSelect().sizeSelectEllipse match  //Ellipse furniture out
             case (f: Furniture) =>
               floorPlanBox.children += f
               furnitures = f +: furnitures
@@ -215,7 +202,6 @@ object Main extends JFXApp3:
               floorPlanBox.children += f
               furnitures = f +: furnitures
               println(f.nameOut)
-              println("Sait toimiin")
             case _ => println("Something went wrong")
 
     val closetButton = new Button("Closet")
@@ -226,7 +212,6 @@ object Main extends JFXApp3:
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
               println(f.nameOut)
-              println("Sait toimiin")
             case _ => println("something else happened")
 
     val lampButton = new Button("Lamp")
@@ -237,38 +222,49 @@ object Main extends JFXApp3:
               floorPlanBox.children += f
               furnitures = f +: furnitures
               println(f.nameOut)
-              println("Sait toimiin")
             case _ => println("Something went wrong")
 
     val tvButton = new Button("TV")
+      tvButton.onAction = (event) =>
+        possibleFurniture = Option("TV")
+        sizeSelect().sizeSelectForTV match
+            case (f: Furniture) =>
+              furnitures = f +: furnitures
+              floorPlanBox.children += f   //Here we add the shape to the picture
+              println(f.nameOut)
+            case _ => println("something else happened")
 
     val sofaButton = new Button("Sofa")
       sofaButton.onAction = (event) =>
         possibleFurniture = Option("Sofa")
         shapeSelect()
+    //Button for adding walls
     val addWall = new Button("Add wall")
       addWall.layoutX = 400
       addWall.onAction = (event) => MovableLine(floorPlanBox)
 
 
     //This is the original GUI
+    //Here is the box on the left witch contais buttons for furnitures and other commands
     val sideLBox= new VBox:
       background = Background.fill(LightPink)
       spacing = 5
       children = Array( top, tableButton, bedButton,carpetButton, chairButton, closetButton, lampButton, tvButton, sofaButton)
 
-    val label = new Label("Design your dream home!")
+    val label = new Label("Design your dream home!")  //The label that is written on top of the image space.
     label.font = Font(18)
 
-    val topBox = new HBox:
+    val topBox = new HBox:  //This is the top box
       spacing = 60
       background = Background.fill(White)
       children = Array(label, addWall)
 
+    // here the program sets the boxes to their places
     root.add(sideLBox, 0, 0, 1, 2)
     root.add(topBox, 1, 0, 1, 1)
     root.add(floorPlanBox, 1, 1, 1, 1)
 
+    // Implementung the perecentage of each box
     val column0 = new ColumnConstraints:
       percentWidth = 6
     val column1 = new ColumnConstraints:

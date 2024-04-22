@@ -21,8 +21,11 @@ class DragController:
   private var anchorY: Double = 0
   private var yOffset: Double = 0
   private var xOffset: Double = 0
+  // the coordinates are stored here for the overlapMistake.
+  // if there is a problem with overlapping the program returns the shape in it's previous state.
   private var previousY: Double = 0
   private var previousX: Double = 0
+
   private var cycleStatus: Double = 0    //when cycleStatus is 0 it's INACTIVE, when 1 it's ACTIVE
 
   private var forTheFirstMove = 0
@@ -42,13 +45,18 @@ class DragController:
 
     val shape = target.shapeOut
     shape.onMousePressed = (event) =>
+
+      // stores the starting point of the furniture before moving
       previousX = event.getSceneX
       previousY = event.getSceneY
+
+      // When the primary Button (left button of mouse) is pressed
+      // the starting point is stored in anchors where the coordinates are used for
+      // calculations for the new point (point where the furniture is moved).
       if (event.isPrimaryButtonDown) then
         cycleStatus = 1
         anchorY = event.getSceneY
         anchorX = event.getSceneX
-        println(anchorX.toString + "this is Ax" + anchorY.toString + "this is Ay")
 
         if forTheFirstMove != 0 then
           yOffset = target.y - anchorY

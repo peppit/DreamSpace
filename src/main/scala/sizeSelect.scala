@@ -1,4 +1,4 @@
-import Main.{furnitures, possibleFurniture, stage}
+import Main.{possibleFurniture, stage}
 import scalafx.application.Platform
 import scalafx.geometry.Insets
 import scalafx.scene.control.ButtonBar.ButtonData
@@ -11,13 +11,21 @@ import scalafx.Includes.jfxColor2sfx
 import scalafx.Includes.jfxPaint2sfx
 import scalafx.scene.paint.Color
 
+// This is the class witch contains the different shape option's alerts.
+// After choosing one of the shapes, there will be an Alert which asks for measurements.
+// Depending on the shape that has been chosen, the Alert may vary as well as the drawn shape.
+
 class sizeSelect:
-  
+
+
+  // If user has chosen Rectangle:
   def sizeSelectRectangle =
 
+  //Measured shape and chosen color are being stored in here for later, when the program constructs the wanted Furniture
       var possibleRect: Option[Rectangle] = None
       var possibleColor: Option[Color] = None
 
+    //The dialog which asks the user to implement the color and shape of furniture
       val dialog = new Dialog[Rectangle]():
         initOwner(stage)
         title = "Measurements"
@@ -85,19 +93,22 @@ class sizeSelect:
           val drag = new DragController()
           drag.createHandlers(RectangleFurniture)
           RectangleFurniture
-          
-          
+
+
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
-        
-     
-  
-  
+
+
+
+
   // Alert for selecting size and color for circle shaped furniture:
   def sizeSelectCircle =
+
+  //Measured shape and chosen color are being stored in here for later, when the program constructs the wanted Furniture
     var possibleColor: Option[Color] = None
     var possibleCircle: Option[Circle]= None
 
+  //The dialog which asks the user to implement the color and shape of furniture
     val dialog = new Dialog[Circle]():
       initOwner(stage)
       title = "Measurements"
@@ -158,13 +169,16 @@ class sizeSelect:
 
       case None => println("Dialog returned: None")
       case _ => println("something else happened")
-      
-      
+
+
   // Alert for selecting size and color for ellipse shaped furniture:
   def sizeSelectEllipse =
+
+  //Measured shape and chosen color are being stored in here for later, when the program constructs the wanted Furniture
     var possibleEllipse: Option[Ellipse]= None
     var possibleColor: Option[Color] = None
 
+    //The dialog which asks the user to implement the color and shape of furniture
     val dialog = new Dialog[Ellipse]():
       initOwner(stage)
       title = "Measurements"
@@ -233,4 +247,71 @@ class sizeSelect:
       case None => println("Dialog returned: None")
       case _ => println("something else happened")
 
+// If user has chosen TV as an furniture, the height and the width are constant:
+  def sizeSelectForTV =
+
+  //Measured shape and chosen color are being stored in here for later, when the program constructs the wanted Furniture
+      var possibleRect: Option[Rectangle] = None
+
+    //The dialog which asks the user to implement the color and shape of furniture
+      val dialog = new Dialog[Rectangle]():
+        initOwner(stage)
+        title = "Measurements"
+        headerText = "Please enter the measurements"
+
+      val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
+      dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
+
+      val sideL1 = new TextField():
+        promptText = "lenght in cm"
+
+      val colorPick = new ColorPicker()
+
+      val grid = new GridPane():
+         hgap = 10
+         vgap = 10
+         padding = Insets(20, 100, 10, 10)
+
+         add(new Label("Width:"), 0, 0)
+         add(sideL1, 1,0)
+
+      val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
+      confirmButton.disable = true
+
+      sideL1.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+
+      dialog.dialogPane().content = grid
+
+      Platform.runLater(sideL1.requestFocus())
+
+      dialog.resultConverter = dialogButton =>
+        if (dialogButton == confirmButtonType) then
+          possibleRect = Option(Rectangle(sideL1.text().toDouble, 10, Color.Black))
+          Rectangle(sideL1.text().toDouble, 10, Color.Black)
+        else
+          null
+
+      val result = dialog.showAndWait()
+
+      result match
+        case Some(re: Rectangle) =>
+          val r = new Rectangle()
+          r.setX(400)
+          r.setY(50)
+          r.setWidth(possibleRect.get.width.toDouble)
+          r.setHeight(possibleRect.get.height.toDouble)
+          r.fill = possibleRect.get.fill.get()
+
+          val RectangleFurniture = Furniture(possibleFurniture.get, r, Color.Black)
+          RectangleFurniture.x = 400
+          RectangleFurniture.y = 50
+          val drag = new DragController()
+          drag.createHandlers(RectangleFurniture)
+          RectangleFurniture
+
+
+        case None => println("Dialog returned: None")
+        case _ => println("something else happened")
 
