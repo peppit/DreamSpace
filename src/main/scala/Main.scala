@@ -25,7 +25,11 @@ import cats.syntax.either.*
 import io.circe.*
 
 import java.io.File
+import java.nio.charset.Charset
+import java.nio.file.{Files, Paths}
 import scala.collection.mutable
+import upickle.default.{ReadWriter => RW, macroRW}
+
 
 
 
@@ -38,15 +42,30 @@ object Main extends JFXApp3:
   val furnituresForData = mutable.Buffer[FurnitureData]()
   var pictureForData: Option[ImageView] = None
 
+  //SIIS MITEN???
   case class Data(val picture: ImageView, val furnitures: mutable.Buffer[FurnitureData])
   case class FurnitureData(val shape: Shape, val color: Color, val xPos: Double, val yPos: Double)
+  case class SaveFormat(
+    val data: List[Data]
+  )
+  object SaveFormat:
+    implicit val rw: RW[SaveFormat] = macroRW
 
   def saveData() =
     for f <- furnitures do
       furnituresForData += FurnitureData(f.shapeOut,f.colorOut, f.x, f.y)
     Data(pictureForData.get, furnituresForData)
 
+  def saveFormat(appData: Data) =
 
+    val updatedData = SaveFormat(List(appData))
+
+    val writer = Files.newBufferedWriter(Paths.get("./src/main/savedData.json"), Charset.forName("UTF-8"))
+
+    unpickle.default.writeTo[SaveFormat](updatedData, writer, 2)
+    writer.close()
+
+//unpicklee ei löydy :(
 
   def start() =
 
