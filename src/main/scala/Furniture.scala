@@ -1,17 +1,18 @@
+import scalafx.scene.paint.Color
 import scalafx.scene.shape.Shape
 
-class Furniture(name: String, shape: Shape) extends Shape(shape):
+class Furniture(name: String, shape: Shape, color: Color) extends Shape(shape):
+
 
   val nameOut = name
+  val colorOut = color
   
   var x: Double = this.shape.getLayoutX
   var y: Double = this.shape.getLayoutY
   
   val shapeOut = shape
-  
-  def fits(s: Shape) = true     // onks tää täällä vai GUI:ssa
 
-  def overLapMistake: Boolean =
+  def overlapMistake: Boolean =
     val thisFurnitureOut = Main.furnitures.filter( f => f != this)
     if this.nameOut == "Lamp" then
       println("3")
@@ -25,12 +26,5 @@ class Furniture(name: String, shape: Shape) extends Shape(shape):
       true
     else false
 
-
-  layoutX = y
-  layoutY = x
-
- // def canPutOnto(furniture: Furniture): Boolean = 
-  
-//  def info(): String
   
   

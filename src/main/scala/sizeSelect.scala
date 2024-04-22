@@ -1,0 +1,236 @@
+import Main.{furnitures, possibleFurniture, stage}
+import scalafx.application.Platform
+import scalafx.geometry.Insets
+import scalafx.scene.control.ButtonBar.ButtonData
+import scalafx.scene.control.{ButtonType, ColorPicker, Dialog, Label, TextField}
+import scalafx.scene.layout.GridPane
+import scalafx.scene.shape.{Circle, Ellipse, Rectangle}
+import scalafx.Includes.jfxDialogPane2sfx
+import scalafx.Includes.jfxNode2sfx
+import scalafx.Includes.jfxColor2sfx
+import scalafx.Includes.jfxPaint2sfx
+import scalafx.scene.paint.Color
+
+class sizeSelect:
+  
+  def sizeSelectRectangle =
+
+      var possibleRect: Option[Rectangle] = None
+      var possibleColor: Option[Color] = None
+
+      val dialog = new Dialog[Rectangle]():
+        initOwner(stage)
+        title = "Measurements"
+        headerText = "Please enter the measurements and wanted colour."
+
+      val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
+      dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
+
+      val sideL1 = new TextField():
+        promptText = "lenght in cm"
+
+      val sideL2 = new TextField():
+        promptText = "lenght in cm"
+
+      val colorPick = new ColorPicker()
+
+      val grid = new GridPane():
+         hgap = 10
+         vgap = 10
+         padding = Insets(20, 100, 10, 10)
+
+         add(new Label("Width:"), 0, 0)
+         add(sideL1, 1,0)
+         add(new Label("Height:"), 0, 1)
+         add(sideL2,1,1)
+         add(new Label("Color:"), 0, 2)
+         add(colorPick, 1, 2)
+
+      val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
+      confirmButton.disable = true
+
+      sideL1.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+      sideL2.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+
+      dialog.dialogPane().content = grid
+
+      Platform.runLater(sideL1.requestFocus())
+
+      dialog.resultConverter = dialogButton =>
+        if (dialogButton == confirmButtonType) then
+          possibleRect = Option(Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.getValue))
+          possibleColor = Option(colorPick.getValue)
+          Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.getValue)
+        else
+          null
+
+      val result = dialog.showAndWait()
+
+      result match
+        case Some(re: Rectangle) =>
+          val r = new Rectangle()
+          r.setX(400)
+          r.setY(50)
+          r.setWidth(possibleRect.get.width.toDouble)
+          r.setHeight(possibleRect.get.height.toDouble)
+          r.fill = possibleRect.get.fill.get()
+
+          val RectangleFurniture = Furniture(possibleFurniture.get, r, possibleColor.get)
+          RectangleFurniture.x = 400
+          RectangleFurniture.y = 50
+          val drag = new DragController()
+          drag.createHandlers(RectangleFurniture)
+          RectangleFurniture
+          
+          
+        case None => println("Dialog returned: None")
+        case _ => println("something else happened")
+        
+     
+  
+  
+  // Alert for selecting size and color for circle shaped furniture:
+  def sizeSelectCircle =
+    var possibleColor: Option[Color] = None
+    var possibleCircle: Option[Circle]= None
+
+    val dialog = new Dialog[Circle]():
+      initOwner(stage)
+      title = "Measurements"
+      headerText = "Please enter the measurements and wanted colour."
+
+    val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
+    dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
+
+    val diameter = new TextField():
+      promptText = "diameter in cm"
+
+    val colorPick = new ColorPicker()
+
+    val grid = new GridPane():
+       hgap = 10
+       vgap = 10
+       padding = Insets(20, 100, 10, 10)
+
+       add(new Label("Diameter in cm:"), 0, 0)
+       add(diameter, 1,0)
+       add(new Label("Color:"), 0, 1)
+       add(colorPick, 1, 1)
+
+    val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
+    confirmButton.disable = true
+
+    diameter.text.onChange { (_, _, newValue) =>
+      confirmButton.disable = newValue.trim().isEmpty
+    }
+
+    dialog.dialogPane().content = grid
+
+    Platform.runLater(diameter.requestFocus())
+
+    dialog.resultConverter = dialogButton =>
+      if (dialogButton == confirmButtonType) then
+        possibleCircle = Option(Circle(diameter.text().toDouble, colorPick.getValue))
+        possibleColor = Option(colorPick.getValue)
+        Circle(diameter.text().toDouble, colorPick.getValue)
+      else
+        null
+
+    val result = dialog.showAndWait()
+
+    result match
+      case Some(c: Circle) =>
+        val cir = new Circle()
+        cir.setCenterX(400)
+        cir.setCenterY(50)
+        cir.setRadius(possibleCircle.get.radius.toDouble /2)
+        cir.fill = possibleCircle.get.fill.get()
+        val circleFurniture = Furniture(possibleFurniture.get, cir, possibleColor.get)
+        circleFurniture.x = 400
+        circleFurniture.y = 50
+        val drag = new DragController()
+        drag.createHandlers(circleFurniture)
+        circleFurniture
+
+      case None => println("Dialog returned: None")
+      case _ => println("something else happened")
+      
+      
+  // Alert for selecting size and color for ellipse shaped furniture:
+  def sizeSelectEllipse =
+    var possibleEllipse: Option[Ellipse]= None
+    var possibleColor: Option[Color] = None
+
+    val dialog = new Dialog[Ellipse]():
+      initOwner(stage)
+      title = "Measurements"
+      headerText = "Please enter the measurements and wanted colour."
+
+    val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
+    dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
+
+    val diameterX = new TextField():
+      promptText = "diameter in cm"
+
+    val diameterY = new TextField():
+      promptText = "diameter in cm"
+
+    val colorPick = new ColorPicker()
+
+    val grid = new GridPane():
+       hgap = 10
+       vgap = 10
+       padding = Insets(20, 100, 10, 10)
+       add(new Label("Diameter x in cm:"), 0, 0)
+       add(diameterX, 1,0)
+       add(new Label("Diameter y in cm:"), 0, 1)
+       add(diameterY, 1,1)
+       add(new Label("Color:"), 0, 2)
+       add(colorPick, 1, 2)
+
+    val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
+    confirmButton.disable = true
+
+    diameterX.text.onChange { (_, _, newValue) =>
+      confirmButton.disable = newValue.trim().isEmpty
+    }
+    diameterY.text.onChange { (_, _, newValue) =>
+      confirmButton.disable = newValue.trim().isEmpty
+    }
+
+    dialog.dialogPane().content = grid
+
+    Platform.runLater(diameterX.requestFocus())
+
+    dialog.resultConverter = dialogButton =>
+      if (dialogButton == confirmButtonType) then
+        possibleEllipse = Option(Ellipse(diameterX.text().toDouble/2, diameterY.text().toDouble/2))
+        possibleColor = Option(colorPick.getValue)
+        Ellipse(diameterX.text().toDouble/2, diameterY.text().toDouble/2)
+      else
+        null
+
+    val result = dialog.showAndWait()
+
+    result match
+      case Some(c: Ellipse) =>
+        val el = new Ellipse()
+        el.setCenterX(400)
+        el.setCenterY(50)
+        el.setRadiusX(possibleEllipse.get.radiusX.toDouble)
+        el.setRadiusY(possibleEllipse.get.radiusY.toDouble)
+        el.fill = possibleColor.get
+        val ellipseFurniture = Furniture(possibleFurniture.get, el, possibleColor.get)
+        ellipseFurniture.x = 400
+        ellipseFurniture.y = 50
+        val drag = new DragController()
+        drag.createHandlers(ellipseFurniture)
+        ellipseFurniture
+      case None => println("Dialog returned: None")
+      case _ => println("something else happened")
+
+

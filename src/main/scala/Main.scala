@@ -20,17 +20,32 @@ import scalafx.scene.input.{DragEvent, MouseDragEvent}
 import scalafx.scene.layout.StackPane
 import scalafx.Includes.jfxPaint2sfx
 import scalafx.Includes.jfxColor2sfx
+import io.circe.generic.auto.*
+import cats.syntax.either.*
+import io.circe.*
 
 import java.io.File
+import scala.collection.mutable
 
 
 
 object Main extends JFXApp3:
 
-  var possibleObject: Option[Shape] = None
-  var possibleFurniture: Option[String] = None
-  var furnitures: Array[Furniture] = Array[Furniture]()
-  val movableWalls = Array[MovableLine]()
+  var possibleFurniture: Option[String] = None  //Option for storing the info, which furniture did the user pick
+  var possibleObject: Option[Shape] = None   //Option for storing the info, which shape did the user pick for the furniture
+  var furnitures: Array[Furniture] = Array[Furniture]() //Array for storing the furnitures
+  val movableWalls = Array[MovableLine]() //Array for storing the walls
+  val furnituresForData = mutable.Buffer[FurnitureData]()
+  var pictureForData: Option[ImageView] = None
+
+  case class Data(val picture: ImageView, val furnitures: mutable.Buffer[FurnitureData])
+  case class FurnitureData(val shape: Shape, val color: Color, val xPos: Double, val yPos: Double)
+
+  def saveData() =
+    for f <- furnitures do
+      furnituresForData += FurnitureData(f.shapeOut,f.colorOut, f.x, f.y)
+    Data(pictureForData.get, furnituresForData)
+
 
 
   def start() =
@@ -50,11 +65,10 @@ object Main extends JFXApp3:
       fitWidth = 650
       preserveRatio = true
       layoutX = 150
-
+    pictureForData = Some(imageView)   //save this imageView for data.
 
 // This is were the image of an floorplan is imported and where the shapes are drawn on
-    var floorPlanBox = new Pane():
-      var furnitures = Array[Furniture]()
+    var floorPlanBox = new Pane()
 
 
 // method for selecting the wanted file
@@ -62,12 +76,13 @@ object Main extends JFXApp3:
           val filechooser = new FileChooser:
             title = "Select the picture of the floorplan"
             initialDirectory = File("./src/main/DreamSpace.testikansio")
-            extensionFilters.add(ExtensionFilter("PNG and JPG", Seq("*.png", "*.jpg")))
+            extensionFilters.add(ExtensionFilter("PNG and JPG", Seq("*.png", "*.jpg"))) //only JPG and PNG -pictures allowed
 
           val selectedFile = filechooser.showOpenDialog(stage)
 
           if selectedFile != null then
             imageView.image = new Image(selectedFile.toURI.toString)
+            pictureForData = Some(imageView)
             floorPlanBox.children.add(imageView)
           else
             println("No file selected")
@@ -82,6 +97,7 @@ object Main extends JFXApp3:
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //HERE IS THE PROBLEM
     val menuItemSave = new MenuItem("Save")
+
     menuItemSave.onAction = (event) =>
       val fileChooser = new FileChooser:
             title = "Save your file."
@@ -92,20 +108,20 @@ object Main extends JFXApp3:
 
 
 
-    //Here is the button for filechooser
+    //Here is the menu button for filechooser
     val menu = new Menu("File"):
       items = Array(fileNew, menuItemSave)
 
-    val top = new MenuBar:
+    val top = new MenuBar:   //making the menu bar.
       menus = Array(menu)
 
     //Alert for selecting shapes
     def shapeSelect() =
-
+      //Here are the buttons that the user can choose from:
       val circleB = new ButtonType("Circle")
       val rectangleB = new ButtonType("Rectangle")
       val ellipseB = new ButtonType("Ellipse")
-
+      //The alert that pops up when it's time to select a shape
       val select = new Alert(AlertType.Confirmation):
         initOwner(stage)
         title = "Selecting shape"
@@ -117,237 +133,37 @@ object Main extends JFXApp3:
 
       result match {
         case Some(button) => if button == circleB then
-          sizeSelectCircle()
+          sizeSelect().sizeSelectCircle match
+            case (f: Furniture) =>
+              floorPlanBox.children += f
+              furnitures = f +: furnitures
+              println(f.nameOut)
+              println("Sait toimiin")
+            case _ => println("Something went wrong")
+
         else if button == rectangleB then
-          sizeSelectRectangle()
+          sizeSelect().sizeSelectRectangle match
+            case (f: Furniture) =>
+              furnitures = f +: furnitures
+              floorPlanBox.children += f   //Here we add the shape to the picture
+              println(f.nameOut)
+              println("Sait toimiin")
+            case _ => println("Something went wrong")
+
+
         else if button == ellipseB then
-          sizeSelectEllipse()
+          sizeSelect().sizeSelectEllipse match
+            case (f: Furniture) =>
+              floorPlanBox.children += f
+              furnitures = f +: furnitures
+              println(f.nameOut)
+              println(f.shapeOut.toString)
+            case _ => println("Something went wrong")
+
         else
           println("you chose cancel")
         case _ => println("No button selected")
         }
-
-
-     // Alert for selecting size and color for rectangle shaped objects
-    def sizeSelectRectangle() =
-
-      var possibleRect: Option[Rectangle] = None
-
-      val dialog = new Dialog[Rectangle]():
-        initOwner(stage)
-        title = "Measurements"
-        headerText = "Please enter the measurements and wanted colour."
-
-      val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
-      dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
-
-      val sideL1 = new TextField():
-        promptText = "lenght in cm"
-
-      val sideL2 = new TextField():
-        promptText = "lenght in cm"
-
-      val colorPick = new ColorPicker()
-
-      val grid = new GridPane():
-         hgap = 10
-         vgap = 10
-         padding = Insets(20, 100, 10, 10)
-
-         add(new Label("Width:"), 0, 0)
-         add(sideL1, 1,0)
-         add(new Label("Height:"), 0, 1)
-         add(sideL2,1,1)
-         add(new Label("Color:"), 0, 2)
-         add(colorPick, 1, 2)
-
-      val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
-      confirmButton.disable = true
-
-      sideL1.text.onChange { (_, _, newValue) =>
-        confirmButton.disable = newValue.trim().isEmpty
-      }
-      sideL2.text.onChange { (_, _, newValue) =>
-        confirmButton.disable = newValue.trim().isEmpty
-      }
-
-      dialog.dialogPane().content = grid
-
-      Platform.runLater(sideL1.requestFocus())
-
-      dialog.resultConverter = dialogButton =>
-        if (dialogButton == confirmButtonType) then
-          possibleRect = Option(Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.getValue))
-          Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.getValue)
-        else
-          null
-
-      val result = dialog.showAndWait()
-
-      result match
-        case Some(re: Rectangle) =>
-          val r = new Rectangle()
-          r.setX(400)
-          r.setY(50)
-          r.setWidth(possibleRect.get.width.toDouble)
-          r.setHeight(possibleRect.get.height.toDouble)
-          r.fill = possibleRect.get.fill.get()
-
-          val RectangleFurniture = Furniture(possibleFurniture.get, r)
-          RectangleFurniture.x = 400
-          RectangleFurniture.y = 50
-          val drag = new DragController()
-          drag.createHandlers(RectangleFurniture)
-          
-          furnitures = RectangleFurniture +: furnitures
-          floorPlanBox.children += RectangleFurniture   //Here we add the shape to the picture
-          println(RectangleFurniture.nameOut)
-          println("Sait toimiin")
-
-        case None => println("Dialog returned: None")
-        case _ => println("something else happened")
-
-    // Alert for selecting size and color for circle shaped furniture:
-    def sizeSelectCircle() =
-      var possibleCircle: Option[Circle]= None
-
-      val dialog = new Dialog[Circle]():
-        initOwner(stage)
-        title = "Measurements"
-        headerText = "Please enter the measurements and wanted colour."
-
-      val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
-      dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
-
-      val diameter = new TextField():
-        promptText = "diameter in cm"
-
-      val colorPick = new ColorPicker()
-
-      val grid = new GridPane():
-         hgap = 10
-         vgap = 10
-         padding = Insets(20, 100, 10, 10)
-
-         add(new Label("Diameter in cm:"), 0, 0)
-         add(diameter, 1,0)
-         add(new Label("Color:"), 0, 1)
-         add(colorPick, 1, 1)
-
-      val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
-      confirmButton.disable = true
-
-      diameter.text.onChange { (_, _, newValue) =>
-        confirmButton.disable = newValue.trim().isEmpty
-      }
-
-      dialog.dialogPane().content = grid
-
-      Platform.runLater(diameter.requestFocus())
-
-      dialog.resultConverter = dialogButton =>
-        if (dialogButton == confirmButtonType) then
-          possibleCircle = Option(Circle(diameter.text().toDouble, colorPick.getValue))
-          Circle(diameter.text().toDouble, colorPick.getValue)
-        else
-          null
-
-      val result = dialog.showAndWait()
-
-      result match
-        case Some(c: Circle) =>
-          val cir = new Circle()
-          cir.setCenterX(400)
-          cir.setCenterY(50)
-          cir.setRadius(possibleCircle.get.radius.toDouble /2)
-          cir.fill = possibleCircle.get.fill.get()
-          val circleFurniture = Furniture(possibleFurniture.get, cir)
-          circleFurniture.x = 400
-          circleFurniture.y = 50
-          val drag = new DragController()
-          drag.createHandlers(circleFurniture)
-          floorPlanBox.children += circleFurniture
-          furnitures = circleFurniture +: furnitures
-          println(circleFurniture.nameOut)
-          println("Sait toimiin")
-
-        case None => println("Dialog returned: None")
-        case _ => println("something else happened")
-
-        // Alert for selecting size and color for circle shaped furniture:
-    def sizeSelectEllipse() =
-      var possibleEllipse: Option[Ellipse]= None
-      var possibleColor: Option[Color] = None
-
-      val dialog = new Dialog[Ellipse]():
-        initOwner(stage)
-        title = "Measurements"
-        headerText = "Please enter the measurements and wanted colour."
-
-      val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
-      dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
-
-      val diameterX = new TextField():
-        promptText = "diameter in cm"
-
-      val diameterY = new TextField():
-        promptText = "diameter in cm"
-
-      val colorPick = new ColorPicker()
-
-      val grid = new GridPane():
-         hgap = 10
-         vgap = 10
-         padding = Insets(20, 100, 10, 10)
-         add(new Label("Diameter x in cm:"), 0, 0)
-         add(diameterX, 1,0)
-         add(new Label("Diameter y in cm:"), 0, 1)
-         add(diameterY, 1,1)
-         add(new Label("Color:"), 0, 2)
-         add(colorPick, 1, 2)
-
-      val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
-      confirmButton.disable = true
-
-      diameterX.text.onChange { (_, _, newValue) =>
-        confirmButton.disable = newValue.trim().isEmpty
-      }
-      diameterY.text.onChange { (_, _, newValue) =>
-        confirmButton.disable = newValue.trim().isEmpty
-      }
-
-      dialog.dialogPane().content = grid
-
-      Platform.runLater(diameterX.requestFocus())
-
-      dialog.resultConverter = dialogButton =>
-        if (dialogButton == confirmButtonType) then
-          possibleEllipse = Option(Ellipse(diameterX.text().toDouble/2, diameterY.text().toDouble/2))
-          possibleColor = Option(colorPick.getValue)
-          Ellipse(diameterX.text().toDouble/2, diameterY.text().toDouble/2)
-        else
-          null
-
-      val result = dialog.showAndWait()
-
-      result match
-        case Some(c: Ellipse) =>
-          val el = new Ellipse()
-          el.setCenterX(400)
-          el.setCenterY(50)
-          el.setRadiusX(possibleEllipse.get.radiusX.toDouble)
-          el.setRadiusY(possibleEllipse.get.radiusY.toDouble)
-          el.fill = possibleColor.get
-          val ellipseFurniture = Furniture(possibleFurniture.get, el)
-          ellipseFurniture.x = 400
-          ellipseFurniture.y = 50
-          val drag = new DragController()
-          drag.createHandlers(ellipseFurniture)
-          floorPlanBox.children += ellipseFurniture
-          furnitures = ellipseFurniture +: furnitures
-          println(ellipseFurniture.nameOut)
-        case None => println("Dialog returned: None")
-        case _ => println("something else happened")
 
 
     // Buttons for furnitures:
@@ -355,28 +171,58 @@ object Main extends JFXApp3:
       tableButton.onAction = (event) =>
         possibleFurniture = Option("Table")
         shapeSelect()
+
     val bedButton = new Button("Bed")
       bedButton.onAction = (event) =>
         possibleFurniture = Option("Bed")
-        sizeSelectRectangle()
+        sizeSelect().sizeSelectRectangle match
+            case (f: Furniture) =>
+              furnitures = f +: furnitures
+              floorPlanBox.children += f   //Here we add the shape to the picture
+              println(f.nameOut)
+              println("Sait toimiin")
+            case _ => println("something else happened")
+
     val carpetButton = new Button("Carpet")
       carpetButton.onAction = (event) =>
         possibleFurniture = Option("Carpet")
         shapeSelect()
+
     val chairButton = new Button("Chair")
       chairButton.onAction = (event) =>
         possibleFurniture = Option("Chair")
-        sizeSelectCircle()
+        sizeSelect().sizeSelectCircle match
+            case (f: Furniture) =>
+              floorPlanBox.children += f
+              furnitures = f +: furnitures
+              println(f.nameOut)
+              println("Sait toimiin")
+            case _ => println("Something went wrong")
+
     val closetButton = new Button("Closet")
-      possibleFurniture = Option("Closet")
       closetButton.onAction = (event) =>
         possibleFurniture = Option("Closet")
-        sizeSelectRectangle()
+        sizeSelect().sizeSelectRectangle match
+            case (f: Furniture) =>
+              furnitures = f +: furnitures
+              floorPlanBox.children += f   //Here we add the shape to the picture
+              println(f.nameOut)
+              println("Sait toimiin")
+            case _ => println("something else happened")
+
     val lampButton = new Button("Lamp")
       lampButton.onAction = (event) =>
         possibleFurniture = Option("Lamp")
-        sizeSelectCircle()
+        sizeSelect().sizeSelectCircle match
+            case (f: Furniture) =>
+              floorPlanBox.children += f
+              furnitures = f +: furnitures
+              println(f.nameOut)
+              println("Sait toimiin")
+            case _ => println("Something went wrong")
+
     val tvButton = new Button("TV")
+
     val sofaButton = new Button("Sofa")
       sofaButton.onAction = (event) =>
         possibleFurniture = Option("Sofa")

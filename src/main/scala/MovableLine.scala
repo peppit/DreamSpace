@@ -19,10 +19,10 @@ class MovableLine(pane: Pane) {
   private var cycleStatus: Double = 0
 
 
-  var startX0 = 200
-  var startY0 = 200
-  var endX0 = 300
-  var endY0 = 200
+  var startX0:Double = 200
+  var startY0:Double = 200
+  var endX0:Double = 300
+  var endY0:Double = 200
 
   var line = new Line:   //Line witch is the "wall"
     startX = startX0
@@ -32,7 +32,7 @@ class MovableLine(pane: Pane) {
     stroke = Color.Black
     strokeWidth = 3
 
-  private def createDraggablePoint(x: Double, y: Double): Circle = {
+  def createDraggablePoint(x: Double, y: Double): Circle = {
     var point = new Circle
     point.setCenterX(x)
     point.setCenterY(y)
@@ -41,8 +41,8 @@ class MovableLine(pane: Pane) {
     point
   }
 
-  val startPoint = createDraggablePoint(startX0, startY0)   //the starting point of the line
-  val endPoint = createDraggablePoint(endX0, endY0)        // the end of the line.
+  val startPoint: Circle = createDraggablePoint(startX0, startY0)   //the starting point of the line
+  val endPoint: Circle = createDraggablePoint(endX0, endY0)        // the end of the line.
 
   startPoint.onMousePressed = (event) =>
     if (event.isPrimaryButtonDown) then
@@ -62,7 +62,7 @@ class MovableLine(pane: Pane) {
     //if (newX >= startX0 && newX <= endX0) then
     startPoint.centerX = newX
     startPoint.centerY = newY
-    updateline()
+    updateLine()
   }
   startPoint.onMouseDragged = (event: MouseEvent) =>{
     val newX = event.x
@@ -70,7 +70,7 @@ class MovableLine(pane: Pane) {
     //if (newX >= startX0 && newX <= endX0) then
     endPoint.centerX = newX
     endPoint.centerY = newY
-    updateline()
+    updateLine()
   }
   
  // endPoint.onMouseDragged = (event: MouseEvent) => handlePointMouseDragged(event, line, false)
@@ -83,7 +83,7 @@ class MovableLine(pane: Pane) {
 
   pane.children.addAll(line, startPoint, endPoint)
 
-  def updateline() =
+  def updateLine() =
     line.startX = startPoint.centerX.value
     line.endY = startPoint.centerX.value
     line.endX = endPoint.centerX.value

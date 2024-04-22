@@ -1,6 +1,4 @@
-DragContoller.scalassa ongelma kun siirtää ensimmäistä kertaa. 
-Miten tunnistaa toisen huonekalun onko se päällä vai ei? Onko toi mun idea ihan huono?
-Miksi Main luokassa arrayhyn "furnitures" (ihan alussa) ei voi lisätä furnitureja????
- 
+Miten tallentaa JSON tiedosto??
+En osaa ollenkaan enkä löydä tutoriaaleja.
 
 

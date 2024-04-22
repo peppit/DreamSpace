@@ -72,7 +72,7 @@ class DragController:
         shape.setTranslateY(event.getSceneY - anchorY))
 
     shape.setOnMouseReleased((event: MouseEvent) =>
-        if target.overLapMistake then
+        if target.overlapMistake then
           overLapMistakeAlert.showAndWait()
           shape.setLayoutY(previousY + yOffset)
           shape.setLayoutX(previousX + xOffset) 
