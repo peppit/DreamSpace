@@ -19,13 +19,16 @@ class Furniture(name: String, shape: Shape, color: Color) extends Shape(shape):
 // returns false if the overlap is possible
   def overlapMistake: Boolean =
     val thisFurnitureOut = Main.furnitures.filter( f => f != this)
-    if this.nameOut == "Lamp" then
-      println("3")
+  
+    if (this.nameOut == "Lamp") then
       false
     else if (nameOut == "Carpet") && thisFurnitureOut.exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
       println(" 1 ")
       true
-    else if nameOut != "Lamp" && nameOut != "Carpet" && thisFurnitureOut.filter(f => f.nameOut != "Lamp" && f.nameOut != "Carpet" ).exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
+    else if (nameOut == "TV") && thisFurnitureOut.filter(f => f.nameOut != "Carpet" && f.nameOut != "Table" ).exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
+      println(" 1 ")
+      true
+    else if nameOut != "Lamp" && nameOut != "Carpet" && nameOut != "TV" && thisFurnitureOut.filter(f => f.nameOut != "Lamp" && f.nameOut != "Carpet" ).exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
       println(" 2 ")
       println(nameOut + " !!")
       true

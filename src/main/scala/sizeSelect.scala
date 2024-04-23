@@ -47,9 +47,9 @@ class sizeSelect:
          vgap = 10
          padding = Insets(20, 100, 10, 10)
 
-         add(new Label("Width:"), 0, 0)
+         add(new Label("Width x:"), 0, 0)
          add(sideL1, 1,0)
-         add(new Label("Height:"), 0, 1)
+         add(new Label("Width y:"), 0, 1)
          add(sideL2,1,1)
          add(new Label("Color:"), 0, 2)
          add(colorPick, 1, 2)
@@ -70,9 +70,9 @@ class sizeSelect:
 
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
-          possibleRect = Option(Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.getValue))
+          possibleRect = Option(Rectangle(sideL1.text().toDouble * 0.636, sideL2.text().toDouble * 0.636, colorPick.getValue))
           possibleColor = Option(colorPick.getValue)
-          Rectangle(sideL1.text().toDouble, sideL2.text().toDouble, colorPick.getValue)
+          Rectangle(sideL1.text().toDouble * 0.636, sideL2.text().toDouble * 0.636, colorPick.getValue)
         else
           null
 
@@ -145,9 +145,9 @@ class sizeSelect:
 
     dialog.resultConverter = dialogButton =>
       if (dialogButton == confirmButtonType) then
-        possibleCircle = Option(Circle(diameter.text().toDouble, colorPick.getValue))
+        possibleCircle = Option(Circle(diameter.text().toDouble * 0.636, colorPick.getValue))
         possibleColor = Option(colorPick.getValue)
-        Circle(diameter.text().toDouble, colorPick.getValue)
+        Circle(diameter.text().toDouble * 0.636, colorPick.getValue)
       else
         null
 
@@ -222,9 +222,9 @@ class sizeSelect:
 
     dialog.resultConverter = dialogButton =>
       if (dialogButton == confirmButtonType) then
-        possibleEllipse = Option(Ellipse(diameterX.text().toDouble/2, diameterY.text().toDouble/2))
+        possibleEllipse = Option(Ellipse(diameterX.text().toDouble * 0.636, diameterY.text().toDouble * 0.636))
         possibleColor = Option(colorPick.getValue)
-        Ellipse(diameterX.text().toDouble/2, diameterY.text().toDouble/2)
+        Ellipse((diameterX.text().toDouble * 0.636)/2, (diameterY.text().toDouble * 0.636)/2)
       else
         null
 
@@ -235,8 +235,8 @@ class sizeSelect:
         val el = new Ellipse()
         el.setCenterX(400)
         el.setCenterY(50)
-        el.setRadiusX(possibleEllipse.get.radiusX.toDouble)
-        el.setRadiusY(possibleEllipse.get.radiusY.toDouble)
+        el.setRadiusX(possibleEllipse.get.radiusX.toDouble/2)
+        el.setRadiusY(possibleEllipse.get.radiusY.toDouble/2)
         el.fill = possibleColor.get
         val ellipseFurniture = Furniture(possibleFurniture.get, el, possibleColor.get)
         ellipseFurniture.x = 400
@@ -250,10 +250,10 @@ class sizeSelect:
 // If user has chosen TV as an furniture, the height and the width are constant:
   def sizeSelectForTV =
 
-  //Measured shape and chosen color are being stored in here for later, when the program constructs the wanted Furniture
+  //Measured shape is being stored in here for later, when the program constructs the wanted Furniture
       var possibleRect: Option[Rectangle] = None
 
-    //The dialog which asks the user to implement the color and shape of furniture
+    //The dialog which asks the user to implement measurements for the TV
       val dialog = new Dialog[Rectangle]():
         initOwner(stage)
         title = "Measurements"
@@ -265,20 +265,27 @@ class sizeSelect:
       val sideL1 = new TextField():
         promptText = "lenght in cm"
 
-      val colorPick = new ColorPicker()
+      val sideL2 = new TextField():
+        promptText = "lenght in cm"
 
       val grid = new GridPane():
          hgap = 10
          vgap = 10
          padding = Insets(20, 100, 10, 10)
 
-         add(new Label("Width:"), 0, 0)
+         add(new Label("Width x:"), 0, 0)
          add(sideL1, 1,0)
+         add(new Label("Width y:"), 0, 1)
+         add(sideL2,1,1)
+
 
       val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
       confirmButton.disable = true
 
       sideL1.text.onChange { (_, _, newValue) =>
+        confirmButton.disable = newValue.trim().isEmpty
+      }
+      sideL2.text.onChange { (_, _, newValue) =>
         confirmButton.disable = newValue.trim().isEmpty
       }
 
@@ -288,8 +295,8 @@ class sizeSelect:
 
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
-          possibleRect = Option(Rectangle(sideL1.text().toDouble, 10, Color.Black))
-          Rectangle(sideL1.text().toDouble, 10, Color.Black)
+          possibleRect = Option(Rectangle(sideL1.text().toDouble * 0.636, sideL2.text().toDouble * 0.636, Color.Black))
+          Rectangle(sideL1.text().toDouble * 0.636, sideL2.text().toDouble * 0.636, Color.Black)
         else
           null
 
