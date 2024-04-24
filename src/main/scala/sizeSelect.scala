@@ -31,17 +31,22 @@ class sizeSelect:
         title = "Measurements"
         headerText = "Please enter the measurements and wanted colour."
 
+    //Buttons for confirmation and cancel
       val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
       dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
 
+    //Text fields that asks for measurements
+    // The measurements are given in cm.
       val sideL1 = new TextField():
         promptText = "lenght in cm"
 
       val sideL2 = new TextField():
         promptText = "lenght in cm"
 
+    //The color picker
       val colorPick = new ColorPicker()
 
+    //Here is given the coordinates for textfields and colorpicker.
       val grid = new GridPane():
          hgap = 10
          vgap = 10
@@ -54,6 +59,8 @@ class sizeSelect:
          add(new Label("Color:"), 0, 2)
          add(colorPick, 1, 2)
 
+    // Here for the confirmation button is set that it won't work unless there has been given right amount of information
+    // and that the information is being given in right form
       val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
       confirmButton.disable = true
 
@@ -63,11 +70,13 @@ class sizeSelect:
       sideL2.text.onChange { (_, _, newValue) =>
         confirmButton.disable = newValue.trim().isEmpty
       }
-
       dialog.dialogPane().content = grid
 
       Platform.runLater(sideL1.requestFocus())
 
+    // From the given measurements and color the program forms a rectangle.
+    // The rectangle is scaled to the picture by factor 0.636.
+    // By doing this the furnitures are in their realistic measurements on the picture.
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
           possibleRect = Option(Rectangle(sideL1.text().toDouble * 0.636, sideL2.text().toDouble * 0.636, colorPick.getValue))
@@ -78,6 +87,7 @@ class sizeSelect:
 
       val result = dialog.showAndWait()
 
+    // Here the formed Rectangle is implemented on the floorplan.
       result match
         case Some(re: Rectangle) =>
           val r = new Rectangle()
@@ -90,10 +100,9 @@ class sizeSelect:
           val RectangleFurniture = Furniture(possibleFurniture.get, r, possibleColor.get)
           RectangleFurniture.x = 400
           RectangleFurniture.y = 50
-          val drag = new DragController()
+          val drag = new Controller()
           drag.createHandlers(RectangleFurniture)
           RectangleFurniture
-
 
         case None => println("Dialog returned: None")
         case _ => println("something else happened")
@@ -114,14 +123,19 @@ class sizeSelect:
       title = "Measurements"
       headerText = "Please enter the measurements and wanted colour."
 
+  //Buttons for confirmation and cancel
     val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
     dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
 
+  // Text fields that asks for measurements.
+  // The measurements are given in cm.
     val diameter = new TextField():
       promptText = "diameter in cm"
 
+  //The color picker
     val colorPick = new ColorPicker()
 
+  //Here is given the coordinates for textfield and colorpicker.
     val grid = new GridPane():
        hgap = 10
        vgap = 10
@@ -132,6 +146,8 @@ class sizeSelect:
        add(new Label("Color:"), 0, 1)
        add(colorPick, 1, 1)
 
+  // Here for the confirmation button is set that it won't work unless there has been given right amount of information
+  // and that the information is being given in right form.
     val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
     confirmButton.disable = true
 
@@ -143,6 +159,9 @@ class sizeSelect:
 
     Platform.runLater(diameter.requestFocus())
 
+  // From the given measurements and color, the program forms a circle.
+  // The circle is scaled to the picture by factor 0.636.
+  // By doing this the furnitures are in their realistic measurements on the picture.
     dialog.resultConverter = dialogButton =>
       if (dialogButton == confirmButtonType) then
         possibleCircle = Option(Circle(diameter.text().toDouble * 0.636, colorPick.getValue))
@@ -153,6 +172,7 @@ class sizeSelect:
 
     val result = dialog.showAndWait()
 
+  // Here the formed Circle is implemented on the floorplan.
     result match
       case Some(c: Circle) =>
         val cir = new Circle()
@@ -163,7 +183,7 @@ class sizeSelect:
         val circleFurniture = Furniture(possibleFurniture.get, cir, possibleColor.get)
         circleFurniture.x = 400
         circleFurniture.y = 50
-        val drag = new DragController()
+        val drag = new Controller()
         drag.createHandlers(circleFurniture)
         circleFurniture
 
@@ -178,23 +198,27 @@ class sizeSelect:
     var possibleEllipse: Option[Ellipse]= None
     var possibleColor: Option[Color] = None
 
-    //The dialog which asks the user to implement the color and shape of furniture
+  //The dialog which asks the user to implement the color and shape of furniture
     val dialog = new Dialog[Ellipse]():
       initOwner(stage)
       title = "Measurements"
       headerText = "Please enter the measurements and wanted colour."
 
+  //Buttons for confirmation and cancel
     val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
     dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
 
+  // Text fields that asks for measurements
+  // The measurements are given in cm.
     val diameterX = new TextField():
       promptText = "diameter in cm"
-
     val diameterY = new TextField():
       promptText = "diameter in cm"
 
+  //The color picker
     val colorPick = new ColorPicker()
 
+  //Here is given the coordinates for textfields and colorpicker.
     val grid = new GridPane():
        hgap = 10
        vgap = 10
@@ -206,6 +230,8 @@ class sizeSelect:
        add(new Label("Color:"), 0, 2)
        add(colorPick, 1, 2)
 
+  // Here for the confirmation button is set that it won't work unless there has been given right amount of information
+  // and that the information is being given in right form
     val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
     confirmButton.disable = true
 
@@ -215,11 +241,13 @@ class sizeSelect:
     diameterY.text.onChange { (_, _, newValue) =>
       confirmButton.disable = newValue.trim().isEmpty
     }
-
     dialog.dialogPane().content = grid
 
     Platform.runLater(diameterX.requestFocus())
 
+  // From the given measurements and color the program forms an ellipse.
+  // The ellipse is scaled to the picture by factor 0.636.
+  // By doing this the furnitures are in their realistic measurements on the picture.
     dialog.resultConverter = dialogButton =>
       if (dialogButton == confirmButtonType) then
         possibleEllipse = Option(Ellipse(diameterX.text().toDouble * 0.636, diameterY.text().toDouble * 0.636))
@@ -230,6 +258,7 @@ class sizeSelect:
 
     val result = dialog.showAndWait()
 
+  // Here the formed Ellipse is implemented on the floorplan.
     result match
       case Some(c: Ellipse) =>
         val el = new Ellipse()
@@ -241,33 +270,36 @@ class sizeSelect:
         val ellipseFurniture = Furniture(possibleFurniture.get, el, possibleColor.get)
         ellipseFurniture.x = 400
         ellipseFurniture.y = 50
-        val drag = new DragController()
+        val drag = new Controller()
         drag.createHandlers(ellipseFurniture)
         ellipseFurniture
       case None => println("Dialog returned: None")
       case _ => println("something else happened")
 
-// If user has chosen TV as an furniture, the height and the width are constant:
+  // If user has chosen TV as an furniture, the height and the width are constant:
   def sizeSelectForTV =
 
   //Measured shape is being stored in here for later, when the program constructs the wanted Furniture
       var possibleRect: Option[Rectangle] = None
 
-    //The dialog which asks the user to implement measurements for the TV
+  //The dialog which asks the user to implement measurements for the TV
       val dialog = new Dialog[Rectangle]():
         initOwner(stage)
         title = "Measurements"
         headerText = "Please enter the measurements"
 
+  //Buttons for confirmation and cancel
       val confirmButtonType = new ButtonType("Confirm", ButtonData.OKDone)
       dialog.dialogPane().buttonTypes = Seq(confirmButtonType, ButtonType.Cancel)
 
+  // Text fields that asks for measurements
+  // The measurements are given in cm.
       val sideL1 = new TextField():
         promptText = "lenght in cm"
 
       val sideL2 = new TextField():
         promptText = "lenght in cm"
-
+  //Here is given the coordinates for textfields.
       val grid = new GridPane():
          hgap = 10
          vgap = 10
@@ -278,7 +310,8 @@ class sizeSelect:
          add(new Label("Width y:"), 0, 1)
          add(sideL2,1,1)
 
-
+  // Here for the confirmation button is set that it won't work unless there has been given right amount of information
+  // and that the information is being given in right form
       val confirmButton = dialog.dialogPane().lookupButton(confirmButtonType)
       confirmButton.disable = true
 
@@ -293,6 +326,9 @@ class sizeSelect:
 
       Platform.runLater(sideL1.requestFocus())
 
+  // From the given measurements and color the program forms a rectangle.
+  // The rectangle is scaled to the picture by factor 0.636.
+  // By doing this the furnitures are in their realistic measurements on the picture.
       dialog.resultConverter = dialogButton =>
         if (dialogButton == confirmButtonType) then
           possibleRect = Option(Rectangle(sideL1.text().toDouble * 0.636, sideL2.text().toDouble * 0.636, Color.Black))
@@ -302,6 +338,7 @@ class sizeSelect:
 
       val result = dialog.showAndWait()
 
+  // Here the formed Rectangle is implemented on the floorplan.
       result match
         case Some(re: Rectangle) =>
           val r = new Rectangle()
@@ -314,10 +351,9 @@ class sizeSelect:
           val RectangleFurniture = Furniture(possibleFurniture.get, r, Color.Black)
           RectangleFurniture.x = 400
           RectangleFurniture.y = 50
-          val drag = new DragController()
+          val drag = new Controller()
           drag.createHandlers(RectangleFurniture)
           RectangleFurniture
-
 
         case None => println("Dialog returned: None")
         case _ => println("something else happened")

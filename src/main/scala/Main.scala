@@ -1,44 +1,20 @@
-import scalafx.application.{JFXApp, JFXApp3, Platform}
-import scalafx.geometry.{Insets, Orientation, Pos}
-import scalafx.scene.{Scene, image}
-import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, StackPane, VBox}
+import scalafx.application.JFXApp3
+import scalafx.scene.image
+import scalafx.scene.layout.{Background, ColumnConstraints, GridPane, HBox, Pane, RowConstraints, VBox}
 import scalafx.scene.control.Alert.AlertType
-import scalafx.scene.control.ButtonBar.ButtonData
-import scalafx.scene.control.{Alert, Button, ButtonType, ColorPicker, Dialog, Label, Menu, MenuBar, MenuItem, TextField}
+import scalafx.scene.control.{Alert, Button, ButtonType, Label, Menu, MenuBar, MenuItem}
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.*
 import scalafx.scene.text.Font
 import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
-import scalafx.Includes.jfxDialogPane2sfx
-import scalafx.Includes.jfxNode2sfx
-import scalafx.scene.input.KeyCode.A
-import scalafx.scene.shape.{Circle, Ellipse, Rectangle, Shape}
-import scalafx.Includes.string2sfxColor
-import scalafx.scene.input.{DragEvent, MouseDragEvent}
-import scalafx.scene.layout.StackPane
-import scalafx.Includes.jfxPaint2sfx
-import scalafx.Includes.jfxColor2sfx
-import io.circe.generic.auto.*
-import cats.syntax.either.*
-import io.circe.*
-
-import java.io.File
-import java.nio.charset.Charset
-import java.nio.file.{Files, Paths}
-import scala.collection.mutable
-
-import java.awt.image.BufferedImage
+import scalafx.scene.shape.Shape
 import java.io.File
 import javax.imageio.ImageIO
-import scalafx.application.JFXApp
 import scalafx.collections.ObservableBuffer
 import scalafx.embed.swing.SwingFXUtils
-import scalafx.geometry.Side
-import scalafx.Includes._
 import scalafx.scene.{Node, Scene}
-import scalafx.scene.chart.{CategoryAxis, LineChart, NumberAxis, XYChart}
 
 
 
@@ -48,12 +24,11 @@ object Main extends JFXApp3:
   var possibleFurniture: Option[String] = None  //Option for storing the info, which furniture did the user pick
   var possibleObject: Option[Shape] = None   //Option for storing the info, which shape did the user pick for the furniture
   var furnitures: Array[Furniture] = Array[Furniture]() //Array for storing the furnitures
-  val movableWalls = Array[MovableLine]() //Array for storing the walls
 
 
   def start() =
 
-    //the stage for the interface
+  //the stage for the interface
     stage = new JFXApp3.PrimaryStage:
       title = "Dream Space"
       width = 1000
@@ -62,18 +37,18 @@ object Main extends JFXApp3:
     val root = GridPane()
 
 
-// Possible imageview
+  // Possible imageview
     var imageView = new ImageView:
       fitHeight = 650
       fitWidth = 650
       preserveRatio = true
       layoutX = 150
 
-// This is were the image of an floorplan is imported and where the shapes are drawn on
+  // This is were the image of an floorplan is imported and where the shapes are drawn on
     var floorPlanBox = new Pane()
 
 
-// method for selecting the wanted file
+  // method for selecting the wanted file
     def selectFile() =
           val filechooser = new FileChooser:
             title = "Select the picture of the floorplan"
@@ -88,10 +63,11 @@ object Main extends JFXApp3:
           else
             println("No file selected")
 
-    val fileNew = MenuItem("New")                 //Button for selecting new file
+  //Button for selecting new file
+    val fileNew = MenuItem("New")
       fileNew.onAction = (event) => selectFile()
 
-// Here is the menu item for saving the file as a picture.
+  // Here is the menu item for saving the file as a picture.
     val menuItemSave = new MenuItem("Save")
 
     menuItemSave.onAction = (event) =>
@@ -99,12 +75,14 @@ object Main extends JFXApp3:
             title = "Save your file."
             extensionFilters.add(ExtensionFilter("PNG", Seq("*.png")))
       val selectedFile = fileSaver.showSaveDialog(stage)
-      if selectedFile != null then
-        takeSnapshot(floorPlanBox, selectedFile) // Pass floorPlanBox and selectedFile to takeSnapshot
-      else
-        println("No file selected")
 
-    //method for taking the shot of the scene
+   // Takes the snapshot from floorPlanBox and saves it to a File.
+      if selectedFile != null then
+        takeSnapshot(floorPlanBox, selectedFile)
+      else
+        println("The picture was not saved.")
+
+  //method for taking the picture of the scene
     def takeSnapshot(node: Node, file: File) =
       val image = node.snapshot(null, null)
       val bufferedImage = SwingFXUtils.fromFXImage(image, null)
@@ -112,21 +90,21 @@ object Main extends JFXApp3:
       ImageIO.write(bufferedImage, "png", file)
 
 
-
-    //Here is the menu button for filechooser
+  //Here is the menu button for filechooser
     val menu = new Menu("File"):
       items = Array(fileNew, menuItemSave)
 
-    val top = new MenuBar:   //making the menu bar.
+  // Making the menu bar.
+    val top = new MenuBar:
       menus = Array(menu)
 
-    //Alert for selecting shapes
+  //Alert for selecting shapes
     def shapeSelect() =
-      //Here are the buttons that the user can choose from:
+  //Here are the buttons that the user can choose from:
       val circleB = new ButtonType("Circle")
       val rectangleB = new ButtonType("Rectangle")
       val ellipseB = new ButtonType("Ellipse")
-      //The alert that pops up when it's time to select a shape
+  //The alert that pops up when it's time to select a shape
       val select = new Alert(AlertType.Confirmation):
         initOwner(stage)
         title = "Selecting shape"
@@ -136,15 +114,13 @@ object Main extends JFXApp3:
 
       val result = select.showAndWait()
 
-      //Here we match the users choise so we get the next alert and the furniture on to the picture
+  //Here we match the users choise so we get the next alert and the furniture on to the picture
       result match {
         case Some(button) => if button == circleB then
           sizeSelect().sizeSelectCircle match  //circle furniture out
             case (f: Furniture) =>
               floorPlanBox.children += f
               furnitures = f +: furnitures
-              println(f.nameOut)
-              println("Sait toimiin")
             case _ => println("Something went wrong")
 
         else if button == rectangleB then
@@ -152,8 +128,6 @@ object Main extends JFXApp3:
             case (f: Furniture) =>
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
-              println(f.nameOut)
-              println("Sait toimiin")
             case _ => println("Something went wrong")
 
 
@@ -162,8 +136,6 @@ object Main extends JFXApp3:
             case (f: Furniture) =>
               floorPlanBox.children += f
               furnitures = f +: furnitures
-              println(f.nameOut)
-              println(f.shapeOut.toString)
             case _ => println("Something went wrong")
 
         else
@@ -172,7 +144,7 @@ object Main extends JFXApp3:
         }
 
 
-    // Buttons for furnitures:
+  // Buttons for furnitures:
     val tableButton = new Button("Table")
       tableButton.onAction = (event) =>
         possibleFurniture = Option("Table")
@@ -185,9 +157,7 @@ object Main extends JFXApp3:
             case (f: Furniture) =>
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
-              println(f.nameOut)
-              println("Sait toimiin")
-            case _ => println("something else happened")
+            case _ => println("Something went wrong.")
 
     val carpetButton = new Button("Carpet")
       carpetButton.onAction = (event) =>
@@ -201,8 +171,7 @@ object Main extends JFXApp3:
             case (f: Furniture) =>
               floorPlanBox.children += f
               furnitures = f +: furnitures
-              println(f.nameOut)
-            case _ => println("Something went wrong")
+            case _ => println("Something went wrong.")
 
     val closetButton = new Button("Closet")
       closetButton.onAction = (event) =>
@@ -211,8 +180,7 @@ object Main extends JFXApp3:
             case (f: Furniture) =>
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
-              println(f.nameOut)
-            case _ => println("something else happened")
+            case _ => println("Something went wrong.")
 
     val lampButton = new Button("Lamp")
       lampButton.onAction = (event) =>
@@ -222,7 +190,7 @@ object Main extends JFXApp3:
               floorPlanBox.children += f
               furnitures = f +: furnitures
               println(f.nameOut)
-            case _ => println("Something went wrong")
+            case _ => println("Something went wrong.")
 
     val tvButton = new Button("TV")
       tvButton.onAction = (event) =>
@@ -232,20 +200,15 @@ object Main extends JFXApp3:
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
               println(f.nameOut)
-            case _ => println("something else happened")
+            case _ => println("Something went wrong.")
 
     val sofaButton = new Button("Sofa")
       sofaButton.onAction = (event) =>
         possibleFurniture = Option("Sofa")
         shapeSelect()
-    //Button for adding walls
-    val addWall = new Button("Add wall")
-      addWall.layoutX = 400
-      addWall.onAction = (event) => MovableLine(floorPlanBox)
 
-
-    //This is the original GUI
-    //Here is the box on the left witch contais buttons for furnitures and other commands
+  //This is the original GUI
+  //Here is the box on the left witch contais buttons for furnitures and other commands
     val sideLBox= new VBox:
       background = Background.fill(LightPink)
       spacing = 5
@@ -257,14 +220,14 @@ object Main extends JFXApp3:
     val topBox = new HBox:  //This is the top box
       spacing = 60
       background = Background.fill(White)
-      children = Array(label, addWall)
+      children = Array(label)
 
-    // here the program sets the boxes to their places
+  // here the program sets the boxes to their places
     root.add(sideLBox, 0, 0, 1, 2)
     root.add(topBox, 1, 0, 1, 1)
     root.add(floorPlanBox, 1, 1, 1, 1)
 
-    // Implementung the perecentage of each box
+  // Implementung the perecentage of each box
     val column0 = new ColumnConstraints:
       percentWidth = 6
     val column1 = new ColumnConstraints:
