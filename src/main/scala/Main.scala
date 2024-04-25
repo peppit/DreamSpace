@@ -104,7 +104,10 @@ object Main extends JFXApp3:
       val circleB = new ButtonType("Circle")
       val rectangleB = new ButtonType("Rectangle")
       val ellipseB = new ButtonType("Ellipse")
-  //The alert that pops up when it's time to select a shape
+
+  // The alert that pops up when it's time to select a shape
+  // The inspiration for the alert has been taken from site:
+  // https://www.scalafx.org/docs/dialogs_and_alerts/
       val select = new Alert(AlertType.Confirmation):
         initOwner(stage)
         title = "Selecting shape"
@@ -117,14 +120,14 @@ object Main extends JFXApp3:
   //Here we match the users choise so we get the next alert and the furniture on to the picture
       result match {
         case Some(button) => if button == circleB then
-          sizeSelect().sizeSelectCircle match  //circle furniture out
+          SizeSelect().sizeSelectCircle match  //circle furniture out
             case (f: Furniture) =>
               floorPlanBox.children += f
               furnitures = f +: furnitures
             case _ => println("Something went wrong")
 
         else if button == rectangleB then
-          sizeSelect().sizeSelectRectangle match  //rectangle furniture out
+          SizeSelect().sizeSelectRectangle match  //rectangle furniture out
             case (f: Furniture) =>
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
@@ -132,9 +135,9 @@ object Main extends JFXApp3:
 
 
         else if button == ellipseB then
-          sizeSelect().sizeSelectEllipse match  //Ellipse furniture out
+          SizeSelect().sizeSelectEllipse match  //Ellipse furniture out
             case (f: Furniture) =>
-              floorPlanBox.children += f
+              floorPlanBox.children += f //Here we add the shape to the picture
               furnitures = f +: furnitures
             case _ => println("Something went wrong")
 
@@ -153,7 +156,7 @@ object Main extends JFXApp3:
     val bedButton = new Button("Bed")
       bedButton.onAction = (event) =>
         possibleFurniture = Option("Bed")
-        sizeSelect().sizeSelectRectangle match
+        SizeSelect().sizeSelectRectangle match
             case (f: Furniture) =>
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
@@ -167,7 +170,7 @@ object Main extends JFXApp3:
     val chairButton = new Button("Chair")
       chairButton.onAction = (event) =>
         possibleFurniture = Option("Chair")
-        sizeSelect().sizeSelectCircle match
+        SizeSelect().sizeSelectCircle match
             case (f: Furniture) =>
               floorPlanBox.children += f
               furnitures = f +: furnitures
@@ -176,7 +179,7 @@ object Main extends JFXApp3:
     val closetButton = new Button("Closet")
       closetButton.onAction = (event) =>
         possibleFurniture = Option("Closet")
-        sizeSelect().sizeSelectRectangle match
+        SizeSelect().sizeSelectRectangle match
             case (f: Furniture) =>
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
@@ -185,21 +188,19 @@ object Main extends JFXApp3:
     val lampButton = new Button("Lamp")
       lampButton.onAction = (event) =>
         possibleFurniture = Option("Lamp")
-        sizeSelect().sizeSelectCircle match
+        SizeSelect().sizeSelectCircle match
             case (f: Furniture) =>
               floorPlanBox.children += f
               furnitures = f +: furnitures
-              println(f.nameOut)
             case _ => println("Something went wrong.")
 
     val tvButton = new Button("TV")
       tvButton.onAction = (event) =>
         possibleFurniture = Option("TV")
-        sizeSelect().sizeSelectForTV match
+        SizeSelect().sizeSelectForTV match
             case (f: Furniture) =>
               furnitures = f +: furnitures
               floorPlanBox.children += f   //Here we add the shape to the picture
-              println(f.nameOut)
             case _ => println("Something went wrong.")
 
     val sofaButton = new Button("Sofa")
@@ -240,6 +241,7 @@ object Main extends JFXApp3:
     root.columnConstraints = Array(column0,column1)
     root.rowConstraints = Array(row0, row1)
 
+  // Interface scene:
     val scene = new Scene(parent = root)
     stage.scene = scene
 

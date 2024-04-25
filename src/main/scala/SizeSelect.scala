@@ -14,8 +14,10 @@ import scalafx.scene.paint.Color
 // This is the class witch contains the different shape option's alerts.
 // After choosing one of the shapes, there will be an Alert which asks for measurements.
 // Depending on the shape that has been chosen, the Alert may vary as well as the drawn shape.
+// The inspiration for different alerts has been taken from site:
+// https://www.scalafx.org/docs/dialogs_and_alerts/
 
-class sizeSelect:
+class SizeSelect:
 
 
   // If user has chosen Rectangle:

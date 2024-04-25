@@ -10,7 +10,7 @@ class Furniture(name: String, shape: Shape, color: Color) extends Shape(shape):
 //Here we get the shape of the furniture for Data and other methods when moving the furniture
   val shapeOut = shape 
   
-  //Here we get the position of the furniture for Data
+//Here we get the position of the furniture for coordinates for Controller.
   var x: Double = this.shape.getLayoutX
   var y: Double = this.shape.getLayoutY
   
@@ -23,14 +23,10 @@ class Furniture(name: String, shape: Shape, color: Color) extends Shape(shape):
     if (this.nameOut == "Lamp") then
       false
     else if (nameOut == "Carpet") && thisFurnitureOut.exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
-      println(" 1 ")
       true
     else if (nameOut == "TV") && thisFurnitureOut.filter(f => f.nameOut != "Carpet" && f.nameOut != "Table" ).exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
-      println(" 1 ")
       true
     else if nameOut != "Lamp" && nameOut != "Carpet" && nameOut != "TV" && thisFurnitureOut.filter(f => f.nameOut != "Lamp" && f.nameOut != "Carpet" ).exists(f => f.getBoundsInParent.intersects(this.getBoundsInParent)) then
-      println(" 2 ")
-      println(nameOut + " !!")
       true
     else false
 

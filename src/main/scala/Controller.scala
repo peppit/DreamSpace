@@ -1,31 +1,36 @@
 import Main.stage
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
-import scalafx.scene.control.{Alert, Button, ButtonType, ContextMenu, Dialog, Label, MenuButton, MenuItem, TextField}
+import scalafx.scene.control.{Alert, ContextMenu, MenuItem}
 import scalafx.scene.control.Alert.AlertType
 import scala.language.postfixOps
-import scalafx.scene.shape.{Circle, Shape}
+import scalafx.scene.shape.Shape
 
 
 class Controller:
 
   // These stores the cordinates for calculations
+  // Anchors have been ispired by the code in: https://edencoding.com/drag-shapes-javafx/
   private var anchorX: Double = 0
   private var anchorY: Double = 0
 
   // These offsets represent the difference between the current position of the shape and the position
   // of the mouse cursor when the button was pressed.
   // This ensures that when the shape is dragged, it maintains its relative position to the mouse cursor.
-  private var yOffset: Double = 0
+  // Offsets have been ispired by the code in: https://edencoding.com/drag-shapes-javafx/
   private var xOffset: Double = 0
+  private var yOffset: Double = 0
 
   // the coordinates are stored here for the overlapMistake.
   // if there is a problem with overlapping the program returns the shape in it's previous state.
-  private var previousY: Double = 0
+  // These two variables are inspired by student Teea Ahola, but the code that includes
+  // these variables are not. The code is selfmade.
   private var previousX: Double = 0
+  private var previousY: Double = 0
 
   // When cycleStatus is 0 it's INACTIVE, when 1 it's ACTIVE
   // cycleStatus checks that the user presses the left button of the mouse and not the right.
+  // cycleStatus has been ispired by the code in: https://edencoding.com/drag-shapes-javafx/
   private var cycleStatus: Double = 0
 
   // Checks if the movement is the furinture's first.
@@ -38,10 +43,12 @@ class Controller:
     val shape = target.shapeOut
 
   //Alert that pops up if the furniture is in a place where it's not possible to be.
+  // The inspiration for the alert has been taken from site:
+  // https://www.scalafx.org/docs/dialogs_and_alerts/
     val overLapMistakeAlert = new Alert(AlertType.Error):
       initOwner(stage)
       title = "Exception Dialog"
-      headerText = "Overlap mistake."
+      headerText = "Overlap mistake!"
       contentText = "You can not put this furniture here!"
 
   // MenuItem and contextMenu which stores the MenuItem for
@@ -105,7 +112,6 @@ class Controller:
           shape.setTranslateX(0)
           shape.setTranslateY(0)
         else
-
   //Here the furniture is getting located in the moved spot.
           shape.setLayoutY(event.getSceneY + yOffset)
           shape.setLayoutX(event.getSceneX + xOffset)
